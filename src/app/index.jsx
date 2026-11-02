@@ -1,10 +1,12 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
+import AppHeader from "../components/common/AppHeader";
+import WelcomeCard from "../components/cards/WelcomeCard";
 
 export default function HomeScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>CrediHub</Text>
-      <Text style={styles.subtitle}>Твоите финанси. Под твой контрол.</Text>
+      <AppHeader />
+      <WelcomeCard />
     </View>
   );
 }
@@ -13,19 +15,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F5F8FC",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 24,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#1769AA",
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "#64748B",
-    marginTop: 12,
-    textAlign: "center",
+    justifyContent: "flex-start",
+    paddingHorizontal: 24,
+    paddingTop: 60,
   },
 });
