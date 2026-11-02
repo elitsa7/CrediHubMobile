@@ -10,8 +10,15 @@ export default function AppHeader() {
           <Text style={styles.subtitle}>Твоите финанси. Под твой контрол.</Text>
         </View>
 
-        <View style={styles.profileButton}>
-          <Ionicons name="person-outline" size={22} color="#233D8B" />
+        <View style={styles.headerActions}>
+          <View style={styles.notificationButton}>
+            <Ionicons name="notifications-outline" size={23} color="#233D8B" />
+            <View style={styles.notificationDot} />
+          </View>
+
+          <View style={styles.profileButton}>
+            <Ionicons name="person-outline" size={22} color="#233D8B" />
+          </View>
         </View>
       </View>
     </View>
@@ -23,7 +30,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 24,
     paddingTop: 20,
     paddingBottom: 16,
   },
@@ -51,5 +57,30 @@ const styles = StyleSheet.create({
     backgroundColor: "#E8EEFF",
     justifyContent: "center",
     alignItems: "center",
+  },
+  headerActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2,
+  },
+  notificationButton: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: "#E8EEFF",
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
+  },
+  notificationDot: {
+    position: "absolute",
+    top: 9,
+    right: 10,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#EF4444",
+    borderWidth: 1,
+    borderColor: "#E8EEFF",
   },
 });
