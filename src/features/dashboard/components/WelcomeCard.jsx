@@ -14,7 +14,7 @@ export default function WelcomeCard() {
   return (
     <View style={styles.container}>
       <Image
-        source={require("../../../assets/images/welcome-finance.png")}
+        source={require("../../../../assets/images/welcome-finance.png")}
         style={styles.illustration}
         resizeMode="contain"
       />

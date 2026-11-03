@@ -1,8 +1,9 @@
 import { StyleSheet, useWindowDimensions, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AppHeader from "../components/common/AppHeader";
-import WelcomeCard from "../components/cards/WelcomeCard";
+import WelcomeCard from "../features/dashboard/components/WelcomeCard";
 import FinancialCard from "../features/dashboard/components/FinanceSummary";
+import NextPaymentCard from "../features/dashboard/components/NextPaymentCard";
 
 export default function HomeScreen() {
   const { width } = useWindowDimensions();
@@ -13,6 +14,7 @@ export default function HomeScreen() {
         <AppHeader />
         <WelcomeCard />
         <FinancialCard />
+        <NextPaymentCard />
       </ScrollView>
     </SafeAreaView>
   );
