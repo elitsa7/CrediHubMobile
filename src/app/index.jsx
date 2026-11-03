@@ -1,5 +1,6 @@
 import { StyleSheet, useWindowDimensions, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { supabase } from "../lib/supabase";
 import AppHeader from "../components/common/AppHeader";
 import WelcomeCard from "../features/dashboard/components/WelcomeCard";
 import FinancialCard from "../features/dashboard/components/FinanceSummary";
