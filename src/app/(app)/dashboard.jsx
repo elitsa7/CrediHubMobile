@@ -9,6 +9,7 @@ import NextPaymentCard from "../../features/dashboard/components/NextPaymentCard
 export default function HomeScreen() {
   const { width } = useWindowDimensions();
   const styles = createStyles(width);
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>

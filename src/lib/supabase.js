@@ -8,6 +8,7 @@ const supabasePublishableKey = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
 export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
   auth: {
+    flowType: "pkce",
     storage: localStorage,
     autoRefreshToken: true,
     persistSession: true,

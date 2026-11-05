@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useRouter } from "expo-router";
 import { supabase } from "../../../lib/supabase";
 
 import {
@@ -21,6 +22,7 @@ export default function LoginScreen() {
 
   const { width, height } = useWindowDimensions();
   const styles = createStyles(width, height);
+  const router = useRouter();
 
   const handleLogin = async () => {
     setErrorMessage("");
@@ -110,7 +112,13 @@ export default function LoginScreen() {
             </Text>
           </TouchableOpacity>
 
-          <Text style={styles.registerText}>Нямаш профил? Регистрирай се</Text>
+          <View style={styles.registerContainer}>
+            <Text style={styles.registerText}>Нямаш профил?</Text>
+
+            <TouchableOpacity onPress={() => router.push("/register")}>
+              <Text style={styles.registerLink}>Регистрирай се</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -170,10 +178,22 @@ const createStyles = (width, height) => {
       fontSize: 17,
       fontWeight: "bold",
     },
-    registerText: {
-      textAlign: "center",
+    registerContainer: {
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
       marginTop: 25,
+      gap: 5,
+    },
+    registerText: {
       color: "#10285C",
+      fontSize: 14,
+    },
+    registerLink: {
+      color: "#2457B5",
+      fontSize: 14,
+      fontWeight: "bold",
+      textDecorationLine: "underline",
     },
     errorText: {
       color: "#D32F2F",

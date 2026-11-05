@@ -26,6 +26,10 @@ export function AuthProvider({ children }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, newSession) => {
       console.info("[AUTH] Session state changed");
+      console.info(
+        "[AUTH] Current user:",
+        newSession?.user?.email ?? "No user",
+      );
 
       setSession(newSession);
     });
@@ -35,12 +39,26 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
+  const logout = async () => {
+    console.info("[AUTH] Logging out...");
+
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error("[AUTH] Logout failed:", error.message);
+      throw error;
+    }
+
+    console.info("[AUTH] Logout successful");
+  };
+
   return (
     <AuthContext.Provider
       value={{
         session,
         user: session?.user ?? null,
         isLoading,
+        logout,
       }}
     >
       {children}
