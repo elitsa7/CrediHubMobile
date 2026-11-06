@@ -1,7 +1,9 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
 export default function AppHeader() {
+  const router = useRouter();
   return (
     <View style={styles.container}>
       <View style={styles.brand}>
@@ -15,10 +17,13 @@ export default function AppHeader() {
             <Ionicons name="notifications-outline" size={23} color="#233D8B" />
             <View style={styles.notificationDot} />
           </View>
-
-          <View style={styles.profileButton}>
+          <TouchableOpacity
+            style={styles.profileButton}
+            activeOpacity={0.7}
+            onPress={() => router.push("/profile")}
+          >
             <Ionicons name="person-outline" size={22} color="#233D8B" />
-          </View>
+          </TouchableOpacity>
         </View>
       </View>
     </View>

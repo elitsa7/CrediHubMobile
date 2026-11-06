@@ -76,7 +76,7 @@ export default function RegisterScreen() {
     return null;
   };
   const redirectTo = Linking.createURL("auth/callback");
-  console.info("[AUTH] Email redirect URL:", redirectTo);
+
   const handleRegister = async () => {
     setErrorMessage("");
     setEmailAlreadyExists(false);

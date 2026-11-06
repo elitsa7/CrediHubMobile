@@ -26,10 +26,6 @@ export function AuthProvider({ children }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, newSession) => {
       console.info("[AUTH] Session state changed");
-      console.info(
-        "[AUTH] Current user:",
-        newSession?.user?.email ?? "No user",
-      );
 
       setSession(newSession);
     });
