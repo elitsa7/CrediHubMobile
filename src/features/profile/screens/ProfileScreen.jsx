@@ -12,7 +12,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "../../auth/context/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
 import { supabase } from "../../../lib/supabase";
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
+import { useRouter, useFocusEffect } from "expo-router";
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
@@ -30,35 +31,51 @@ export default function ProfileScreen() {
   const [reload, setReload] = useState(0);
   const { width } = useWindowDimensions();
   const styles = createStyles(width);
+  const router = useRouter();
 
-  useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("full_name, phone")
-          .eq("id", user?.id)
-          .single();
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
 
-        if (error) {
-          throw error;
+      const loadProfile = async () => {
+        try {
+          setIsLoading(true);
+          setError(null);
+
+          const { data, error } = await supabase
+            .from("profiles")
+            .select("full_name, phone")
+            .eq("id", user?.id)
+            .single();
+
+          if (error) throw error;
+
+          if (isActive) {
+            setProfile(data);
+            setError(null);
+          }
+        } catch (error) {
+          console.error("[PROFILE] Failed to load:", error.message);
+
+          if (isActive) {
+            setError("Не успяхме да заредим профила.");
+          }
+        } finally {
+          if (isActive) {
+            setIsLoading(false);
+          }
         }
+      };
 
-        setProfile(data);
-      } catch (error) {
-        console.error("[PROFILE] Failed to load profile:", error.message);
-        setError("Не успяхме да заредим профила.");
-      } finally {
-        setIsLoading(false);
+      if (user?.id) {
+        loadProfile();
       }
-    };
 
-    if (user?.id) {
-      loadProfile();
-    }
-  }, [user?.id, reload]);
+      return () => {
+        isActive = false;
+      };
+    }, [user?.id, reload]),
+  );
 
   const handleLogout = () => {
     Alert.alert("Изход от профила", "Сигурни ли сте, че искате да излезете?", [
@@ -122,8 +139,12 @@ export default function ProfileScreen() {
             </View>
 
             <View style={styles.profileInfo}>
-              <Text style={styles.name}>{displayName}</Text>
-              <Text style={styles.email}>{user?.email}</Text>
+              <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">
+                {displayName}
+              </Text>
+              <Text style={styles.email} numberOfLines={1} ellipsizeMode="tail">
+                {user?.email}
+              </Text>
             </View>
 
             <Ionicons name="chevron-forward" size={22} color="#94A3B8" />
@@ -139,7 +160,10 @@ export default function ProfileScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Моят акаунт</Text>
           <View style={styles.menuGroup}>
-            <Pressable style={styles.menuItem}>
+            <Pressable
+              style={styles.menuItem}
+              onPress={() => router.push("/edit-profile")}
+            >
               <Ionicons name="person-outline" size={22} color="#233D8B" />
               <View style={styles.menuText}>
                 <Text style={styles.menuTitle}>Лични данни</Text>
@@ -220,19 +244,6 @@ const createStyles = (width) =>
       flex: 1,
       gap: 4,
       minWidth: 0,
-    },
-    name: {
-      fontSize: width < 380 ? 15 : 18,
-      fontWeight: "700",
-      color: "#233D8B",
-      numberOfLines: 1,
-      ellipsizeMode: "tail",
-    },
-    email: {
-      fontSize: width < 380 ? 11 : 13,
-      color: "#64748B",
-      numberOfLines: 1,
-      ellipsizeMode: "tail",
     },
     profileDetails: {
       flexDirection: "row",
