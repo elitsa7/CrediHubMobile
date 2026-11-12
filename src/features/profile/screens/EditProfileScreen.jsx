@@ -7,11 +7,13 @@ import {
   ActivityIndicator,
   Alert,
   useWindowDimensions,
+  ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "../../auth/context/AuthContext";
 import { supabase } from "../../../lib/supabase";
 import { useState, useEffect } from "react";
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
 export default function EditProfileScreen() {
@@ -129,44 +131,47 @@ export default function EditProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Лични данни</Text>
+      <ScrollView contentContainerStyle={styles.content}>
+        <View style={styles.header}>
+          <Pressable onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={24} color="#233D8B" />
+          </Pressable>
+          <Text style={styles.title}>Лични данни</Text>
+        </View>
 
-      <View style={styles.form}>
-        <Text style={styles.label}>Три имена</Text>
-        <TextInput
-          style={styles.input}
-          value={fullName}
-          onChangeText={setFullName}
-          placeholder="Въведете трите си имена"
-          autoCapitalize="words"
-        />
+        <View style={styles.form}>
+          <Text style={styles.label}>Три имена</Text>
+          <TextInput
+            style={styles.input}
+            value={fullName}
+            onChangeText={setFullName}
+            placeholder="Въведете трите си имена"
+            autoCapitalize="words"
+          />
 
-        <Text style={styles.label}>Телефон</Text>
-        <TextInput
-          style={styles.input}
-          value={phone}
-          onChangeText={setPhone}
-          placeholder="Въведете телефон"
-          keyboardType="phone-pad"
-          maxLength={13}
-        />
+          <Text style={styles.label}>Телефон</Text>
+          <TextInput
+            style={styles.input}
+            value={phone}
+            onChangeText={setPhone}
+            placeholder="Въведете телефон"
+            keyboardType="phone-pad"
+            maxLength={13}
+          />
 
-        <Pressable
-          style={styles.saveButton}
-          onPress={handleSave}
-          disabled={isSaving}
-        >
-          {isSaving ? (
-            <ActivityIndicator color="#FFFFFF" />
-          ) : (
-            <Text style={styles.saveText}>Запази промените</Text>
-          )}
-        </Pressable>
-
-        <Pressable style={styles.backButton} onPress={() => router.back()}>
-          <Text style={styles.backText}>Отказ</Text>
-        </Pressable>
-      </View>
+          <Pressable
+            style={styles.saveButton}
+            onPress={handleSave}
+            disabled={isSaving}
+          >
+            {isSaving ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <Text style={styles.saveText}>Запази промените</Text>
+            )}
+          </Pressable>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -176,14 +181,22 @@ const createStyles = (width) =>
     container: {
       flex: 1,
       backgroundColor: "#bac8e0",
-      paddingHorizontal: width < 380 ? 16 : 24,
-      paddingTop: 24,
+    },
+    content: {
+      flexGrow: 1,
+      padding: width * 0.05,
+      paddingBottom: 30,
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 16,
+      marginBottom: 25,
     },
     title: {
       fontSize: width < 380 ? 23 : 26,
       fontWeight: "800",
       color: "#233D8B",
-      marginBottom: 24,
     },
     form: {
       backgroundColor: "#FFFFFF",
@@ -218,13 +231,5 @@ const createStyles = (width) =>
       color: "#FFFFFF",
       fontWeight: "700",
       fontSize: 15,
-    },
-    backButton: {
-      alignItems: "center",
-      padding: 10,
-    },
-    backText: {
-      color: "#64748B",
-      fontWeight: "600",
     },
   });

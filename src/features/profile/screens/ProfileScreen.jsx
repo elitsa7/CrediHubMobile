@@ -146,8 +146,6 @@ export default function ProfileScreen() {
                 {user?.email}
               </Text>
             </View>
-
-            <Ionicons name="chevron-forward" size={22} color="#94A3B8" />
           </View>
 
           <View style={styles.profileDetails}>
@@ -176,7 +174,10 @@ export default function ProfileScreen() {
 
             <View style={styles.menuDivider} />
 
-            <Pressable style={styles.menuItem}>
+            <Pressable
+              style={styles.menuItem}
+              onPress={() => router.push("/security")}
+            >
               <Ionicons name="lock-closed-outline" size={22} color="#233D8B" />
               <View style={styles.menuText}>
                 <Text style={styles.menuTitle}>Сигурност и парола</Text>
