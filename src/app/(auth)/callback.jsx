@@ -22,7 +22,7 @@ export default function AuthCallback() {
         }
 
         console.info("[AUTH] Email confirmation successful");
-        router.replace("/dashboard");
+        router.replace("/home");
       } catch (error) {
         console.error("[AUTH] Callback failed:", error.message);
         router.replace("/login");

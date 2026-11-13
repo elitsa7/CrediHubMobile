@@ -1,15 +1,22 @@
-import { StyleSheet, useWindowDimensions, ScrollView } from "react-native";
+import {
+  StyleSheet,
+  useWindowDimensions,
+  ScrollView,
+  Pressable,
+  Text,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
 import { supabase } from "../../lib/supabase";
 import AppHeader from "../../components/common/AppHeader";
-import WelcomeCard from "../../features/dashboard/components/WelcomeCard";
-import FinancialCard from "../../features/dashboard/components/FinanceSummary";
-import NextPaymentCard from "../../features/dashboard/components/NextPaymentCard";
+import WelcomeCard from "../../features/home/components/WelcomeCard";
+import FinancialCard from "../../features/home/components/FinanceSummary";
+import NextPaymentCard from "../../features/home/components/NextPaymentCard";
 
 export default function HomeScreen() {
   const { width } = useWindowDimensions();
   const styles = createStyles(width);
-
+  const router = useRouter();
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>

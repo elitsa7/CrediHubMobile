@@ -1,15 +1,18 @@
-import { Ionicons } from "@expo/vector-icons";
 import {
   View,
   Text,
   StyleSheet,
   Image,
   useWindowDimensions,
+  Pressable,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
 export default function WelcomeCard() {
   const { width } = useWindowDimensions();
   const styles = createStyles(width);
+  const router = useRouter();
 
   return (
     <View style={styles.container}>
@@ -30,7 +33,10 @@ export default function WelcomeCard() {
         </Text>
       </View>
 
-      <View style={styles.actionField}>
+      <Pressable
+        style={styles.actionField}
+        onPress={() => router.push("/calculator")}
+      >
         <View style={styles.calculatorIcon}>
           <Ionicons name="calculator" size={30} color="#17366F" />
         </View>
@@ -47,7 +53,7 @@ export default function WelcomeCard() {
             color="#BBD2FF"
           />
         </View>
-      </View>
+      </Pressable>
     </View>
   );
 }

@@ -20,7 +20,7 @@ export default function AuthLayout() {
   }
 
   if (session) {
-    return <Redirect href="/dashboard" />;
+    return <Redirect href="/home" />;
   }
 
   return <Stack screenOptions={{ headerShown: false }} />;
