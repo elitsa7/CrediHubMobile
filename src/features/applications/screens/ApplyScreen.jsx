@@ -2,7 +2,6 @@ import {
   View,
   Text,
   Pressable,
-  TextInput,
   useWindowDimensions,
   ScrollView,
   StyleSheet,
@@ -12,30 +11,41 @@ import { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useAuth } from "../../auth/context/AuthContext";
+import ApplicationReview from "../components/ApplicationReview";
+import ApplicationFormStep from "../components/ApplicationFormStep";
 import { supabase } from "../../../lib/supabase";
 
 export default function ApplyScreen() {
   const { width } = useWindowDimensions();
   const styles = createStyles(width);
+
   const router = useRouter();
-  const [step, setStep] = useState(1);
   const params = useLocalSearchParams();
+  const { user } = useAuth();
+
+  const [step, setStep] = useState(1);
+
   const [monthlyIncome, setMonthlyIncome] = useState("");
   const [workplace, setWorkplace] = useState("");
   const [employmentType, setEmploymentType] = useState("");
+  const [loanPurpose, setLoanPurpose] = useState("");
+
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [profile, setProfile] = useState({
+    fullName: "",
+    phone: "",
+    email: user?.email || "",
+  });
+
   const loan = {
     amount: Number(params.amount),
     months: Number(params.months),
     annualRate: Number(params.annualRate),
     monthlyPayment: Number(params.monthlyPayment),
   };
-  const { user } = useAuth();
-  const [profile, setProfile] = useState({
-    fullName: "",
-    phone: "",
-    email: user?.email || "",
-  });
-  const [isLoading, setIsLoading] = useState(true);
 
   const renderSteps = () => {
     const steps = ["Данни", "Преглед", "Изпращане"];
@@ -75,17 +85,66 @@ export default function ApplyScreen() {
             );
           })}
         </View>
-
-        <View style={styles.progressTrack}>
-          <View
-            style={[
-              styles.progressFill,
-              { width: `${((step - 1) / 2) * 100}%` },
-            ]}
-          />
-        </View>
       </View>
     );
+  };
+
+  const handleNext = () => {
+    const income = Number(monthlyIncome.replace(",", "."));
+
+    if (!monthlyIncome.trim() || !Number.isFinite(income) || income <= 0) {
+      alert("Моля, въведи валиден месечен доход.");
+      return;
+    }
+
+    if (!workplace.trim()) {
+      alert("Моля, въведи месторабота.");
+      return;
+    }
+
+    if (!employmentType) {
+      alert("Моля, избери вид заетост.");
+      return;
+    }
+
+    if (!loanPurpose) {
+      alert("Моля, избери цел на кредита.");
+      return;
+    }
+
+    setStep(2);
+  };
+
+  const handleSubmit = async () => {
+    if (!user?.id) {
+      alert("Трябва да влезеш в профила си.");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      const { error } = await supabase.from("loan_applications").insert({
+        user_id: user.id,
+        requested_amount: loan.amount,
+        annual_interest_rate: loan.annualRate,
+        term_months: loan.months,
+        monthly_income: Number(monthlyIncome.replace(",", ".")),
+        monthly_payment: loan.monthlyPayment,
+        loan_purpose: loanPurpose,
+        workplace: workplace.trim(),
+        employment_type: employmentType,
+      });
+
+      if (error) throw error;
+
+      setStep(3);
+    } catch (error) {
+      console.error("[APPLICATION] Submission failed:", error.message);
+      alert("Възникна грешка при изпращането. Опитай отново.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   useEffect(() => {
@@ -131,106 +190,43 @@ export default function ApplyScreen() {
           <View style={styles.stepperContainer}>{renderSteps()}</View>
         </View>
 
-        <View style={styles.form}>
-          <Text style={styles.sectionTitle}>Лични данни</Text>
-
-          <Text style={styles.inputLabel}>Три имена</Text>
-          <Text style={styles.readOnlyInput}>
-            {profile.fullName || "Няма въведени имена"}
-          </Text>
-
-          <Text style={styles.inputLabel}>Телефон</Text>
-          <Text style={styles.readOnlyInput}>
-            {profile.phone || "Няма въведен телефон"}
-          </Text>
-
-          <Text style={styles.inputLabel}>Имейл</Text>
-          <Text style={styles.readOnlyInput}>
-            {profile.email || "Няма въведен имейл"}
-          </Text>
-        </View>
-
-        <View style={styles.loanCard}>
-          <Text style={styles.loanCardTitle}>Параметри на кредита</Text>
-
-          <View style={styles.loanRow}>
-            <Text style={styles.loanLabel}>Желана сума</Text>
-            <Text style={styles.loanValue}>{loan.amount.toFixed(2)} €</Text>
+        {isLoading ? (
+          <View style={styles.loadingContainer}>
+            <Text style={styles.loadingText}>Зареждане на профила...</Text>
           </View>
+        ) : (
+          <>
+            {step === 1 && (
+              <ApplicationFormStep
+                profile={profile}
+                loan={loan}
+                monthlyIncome={monthlyIncome}
+                setMonthlyIncome={setMonthlyIncome}
+                workplace={workplace}
+                setWorkplace={setWorkplace}
+                employmentType={employmentType}
+                setEmploymentType={setEmploymentType}
+                loanPurpose={loanPurpose}
+                setLoanPurpose={setLoanPurpose}
+                onNext={handleNext}
+              />
+            )}
 
-          <View style={styles.loanRow}>
-            <Text style={styles.loanLabel}>Срок</Text>
-            <Text style={styles.loanValue}>{loan.months} месеца</Text>
-          </View>
-
-          <View style={styles.loanRow}>
-            <Text style={styles.loanLabel}>Годишна лихва</Text>
-            <Text style={styles.loanValue}>{loan.annualRate.toFixed(2)} %</Text>
-          </View>
-
-          <View style={[styles.loanRow, styles.loanRowLast]}>
-            <Text style={[styles.loanLabel, styles.monthlyPaymentLabel]}>
-              Месечна вноска
-            </Text>
-            <Text style={[styles.loanValue, styles.monthlyPaymentValue]}>
-              {loan.monthlyPayment.toFixed(2)} €
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.formCard}>
-          <Text style={styles.sectionTitle}>Финансова информация</Text>
-
-          <Text style={styles.label}>Месечен доход (нето)</Text>
-
-          <TextInput
-            style={styles.input}
-            placeholder="Например 1500"
-            keyboardType="decimal-pad"
-            value={monthlyIncome}
-            onChangeText={setMonthlyIncome}
-          />
-
-          <Text style={styles.label}>Месторабота</Text>
-
-          <TextInput
-            style={styles.input}
-            placeholder="Име на работодателя"
-            value={workplace}
-            onChangeText={setWorkplace}
-          />
-
-          <Text style={styles.label}>Вид заетост</Text>
-
-          <View style={styles.employmentOptions}>
-            {[
-              "Трудов договор",
-              "Самоосигуряващо се лице",
-              "Граждански договор",
-              "Безработен",
-            ].map((option) => (
-              <Pressable
-                key={option}
-                style={[
-                  styles.employmentOption,
-                  employmentType === option && styles.employmentOptionActive,
-                ]}
-                onPress={() => setEmploymentType(option)}
-              >
-                <Ionicons
-                  name={
-                    employmentType === option
-                      ? "radio-button-on"
-                      : "radio-button-off"
-                  }
-                  size={20}
-                  color="#233D8B"
-                />
-                <Text style={styles.optionText}>{option}</Text>
-              </Pressable>
-            ))}
-          </View>
-        </View>
+            {step === 2 && (
+              <ApplicationReview
+                profile={profile}
+                monthlyIncome={monthlyIncome}
+                workplace={workplace}
+                employmentType={employmentType}
+                loanPurpose={loanPurpose}
+                loan={loan}
+                onBack={() => setStep(1)}
+                onSubmit={handleSubmit}
+                isSubmitting={isSubmitting}
+              />
+            )}
+          </>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -250,34 +246,46 @@ const createStyles = (width) =>
     header: {
       flexDirection: "row",
       alignItems: "center",
-      gao: 12,
-      marginBottom: 0,
+      width: "100%",
+      gap: width < 360 ? 8 : 12,
+      marginBottom: 15,
+    },
+    loadingContainer: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingVertical: 40,
+    },
+    loadingText: {
+      color: "#233D8B",
+      fontSize: 15,
+      fontWeight: "600",
     },
     stepperContainer: {
       flex: 1,
+      minWidth: 0,
     },
     stepper: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      backgroundColor: "transparent",
-      paddingHorizontal: 4,
+      width: "100%",
+      paddingHorizontal: width < 360 ? 0 : 4,
       paddingVertical: 2,
     },
     stepsRow: {
       flexDirection: "row",
       justifyContent: "space-between",
-      alignItems: "center",
+      alignItems: "flex-start",
+      width: "100%",
     },
     stepItem: {
       flex: 1,
+      minWidth: 0,
       alignItems: "center",
       gap: 4,
     },
     stepCircle: {
-      width: 30,
-      height: 30,
-      borderRadius: 15,
+      width: width < 350 ? 26 : 30,
+      height: width < 350 ? 26 : 30,
+      borderRadius: width < 350 ? 13 : 15,
       backgroundColor: "#E8EDF5",
       justifyContent: "center",
       alignItems: "center",
@@ -295,131 +303,12 @@ const createStyles = (width) =>
     },
     stepLabel: {
       color: "#94A3B8",
-      fontSize: 12,
+      fontSize: width < 350 ? 10 : width > 430 ? 13 : 12,
       fontWeight: "500",
+      textAlign: "center",
     },
     stepLabelActive: {
       color: "#233D8B",
       fontWeight: "800",
-    },
-    progressTrack: {
-      height: 3,
-      backgroundColor: "rgba(255,255,255,0.35)",
-      borderRadius: 3,
-      marginTop: 14,
-      overflow: "hidden",
-    },
-    progressFill: {
-      height: 3,
-      backgroundColor: "#233D8B",
-      borderRadius: 3,
-    },
-    form: {
-      backgroundColor: "transperant",
-      borderRadius: 0,
-      paddingHorizontal: 4,
-      paddingVertical: 12,
-      marginTop: 12,
-    },
-    sectionTitle: {
-      fontSize: 17,
-      fontWeight: "700",
-      color: "#233D8B",
-      marginBottom: 10,
-    },
-    inputLabel: {
-      fontSize: 13,
-      fontWeight: "600",
-      color: "#64748B",
-      marginTop: 12,
-      marginBottom: 6,
-    },
-    readOnlyInput: {
-      backgroundColor: "#F1F4F9",
-      borderRadius: 10,
-      borderWidth: 1,
-      borderColor: "#E2E8F0",
-      padding: 13,
-      color: "#334155",
-      fontSize: 14,
-    },
-    loanCard: {
-      backgroundColor: "#FFFFFF",
-      borderRadius: 18,
-      padding: 15,
-      marginTop: 18,
-    },
-    loanCardTitle: {
-      color: "#233D8B",
-      fontSize: 17,
-      fontWeight: "700",
-      marginBottom: 12,
-    },
-    loanRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      paddingVertical: 7,
-      borderBottomWidth: 1,
-      borderBottomColor: "rgba(221, 212, 212, 0.93)",
-    },
-    loanLabel: {
-      color: "#64748B",
-      fontSize: 14,
-    },
-    loanValue: {
-      color: "#233D8B",
-      fontSize: 14,
-      fontWeight: "700",
-    },
-    loanRowLast: {
-      borderBottomWidth: 0,
-    },
-    monthlyPaymentLabel: {
-      color: "#233D8B",
-      fontWeight: "700",
-    },
-    monthlyPaymentValue: {
-      fontSize: 17,
-      fontWeight: "800",
-    },
-    formCard: {
-      backgroundColor: "#FFFFFF",
-      borderRadius: 18,
-      padding: 16,
-      marginTop: 14,
-    },
-    label: {
-      fontSize: 15,
-      fontWeight: "600",
-      color: "#64748B",
-      marginTop: 14,
-      marginBottom: 8,
-    },
-    input: {
-      backgroundColor: "#F1F4F9",
-      borderWidth: 1,
-      borderColor: "#E2E8F0",
-      borderRadius: 10,
-      paddingHorizontal: 12,
-      paddingVertical: 10,
-      fontSize: 15,
-      color: "#334155",
-    },
-    employmentOption: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 10,
-      paddingVertical: 1,
-      marginTop: 5,
-    },
-    employmentOptionActive: {
-      backgroundColor: "#EEF2FA",
-      borderRadius: 10,
-      paddingHorizontal: 10,
-    },
-    optionText: {
-      color: "#334155",
-      fontSize: 15,
     },
   });
