@@ -172,6 +172,10 @@ export default function EditProfileScreen() {
           </Pressable>
         </View>
       </ScrollView>
+      <View style={styles.footer}>
+        <Ionicons name="lock-closed" size={15} color="#71809B" />
+        <Text style={styles.footerText}>Твоите данни са защитени</Text>
+      </View>
     </SafeAreaView>
   );
 }
@@ -231,5 +235,17 @@ const createStyles = (width) =>
       color: "#FFFFFF",
       fontWeight: "700",
       fontSize: 15,
+    },
+    footer: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 7,
+      paddingVertical: 16,
+      backgroundColor: "#bac8e0",
+    },
+    footerText: {
+      color: "#71809B",
+      fontSize: 12,
     },
   });
