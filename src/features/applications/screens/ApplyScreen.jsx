@@ -148,8 +148,6 @@ export default function ApplyScreen() {
 
       setApplicationId(data.id);
       setStep(3);
-
-      setStep(3);
     } catch (error) {
       console.error("[APPLICATION] Submission failed:", error.message);
       alert("Възникна грешка при изпращането. Опитай отново.");
@@ -195,7 +193,15 @@ export default function ApplyScreen() {
         contentContainerStyle={styles.scrollContent}
       >
         <View style={styles.header}>
-          <Pressable onPress={() => router.back()}>
+          <Pressable
+            onPress={() => {
+              if (step === 2) {
+                setStep(1);
+              } else {
+                router.back();
+              }
+            }}
+          >
             <Ionicons name="arrow-back" size={25} color="#233D8B" />
           </Pressable>
           <View style={styles.stepperContainer}>{renderSteps()}</View>

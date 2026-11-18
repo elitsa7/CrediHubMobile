@@ -8,6 +8,7 @@ import {
   Alert,
   useWindowDimensions,
   ScrollView,
+  Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "../../auth/context/AuthContext";
@@ -15,6 +16,7 @@ import { supabase } from "../../../lib/supabase";
 import { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
 
 export default function EditProfileScreen() {
   const { user } = useAuth();
@@ -24,6 +26,9 @@ export default function EditProfileScreen() {
 
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState(null);
+  const [selectedAvatarUri, setSelectedAvatarUri] = useState(null);
+
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
@@ -36,7 +41,7 @@ export default function EditProfileScreen() {
 
         const { data, error } = await supabase
           .from("profiles")
-          .select("full_name, phone")
+          .select("full_name, phone, avatar_url")
           .eq("id", user.id)
           .single();
 
@@ -44,6 +49,7 @@ export default function EditProfileScreen() {
 
         setFullName(data.full_name || "");
         setPhone(data.phone || "");
+        setAvatarUrl(data.avatar_url || null);
       } catch (error) {
         console.error("[PROFILE] Failed to load:", error.message);
         setError("Не успяхме да заредим личните данни.");
@@ -57,20 +63,70 @@ export default function EditProfileScreen() {
     }
   }, [user?.id]);
 
+  const handlePickImage = async () => {
+    try {
+      const permission =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (!permission.granted) {
+        Alert.alert(
+          "Необходим достъп",
+          "Разреши достъп до галерията, за да избереш профилна снимка.",
+        );
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled) {
+        setSelectedAvatarUri(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error("[PROFILE] Image picker failed:", error.message);
+      Alert.alert("Грешка", "Не успяхме да отворим галерията.");
+    }
+  };
+
+  const uploadAvatar = async () => {
+    if (!selectedAvatarUri) return avatarUrl;
+
+    const filePath = `${user.id}/avatar-${Date.now()}.jpg`;
+
+    const response = await fetch(selectedAvatarUri);
+    const arrayBuffer = await response.arrayBuffer();
+
+    const { error: uploadError } = await supabase.storage
+      .from("avatars")
+      .upload(filePath, arrayBuffer, {
+        contentType: "image/jpeg",
+        upsert: false,
+      });
+
+    if (uploadError) throw uploadError;
+
+    const { data } = supabase.storage.from("avatars").getPublicUrl(filePath);
+
+    return data.publicUrl;
+  };
+
   const handleSave = async () => {
     const trimmedName = fullName.trim();
     const trimmedPhone = phone.trim();
 
     const nameParts = trimmedName.split(/\s+/);
-    if (
-      trimmedName.split(/\s+/).length !== 3 ||
-      nameParts.some((part) => part.length < 2)
-    ) {
+
+    if (nameParts.length !== 3 || nameParts.some((part) => part.length < 2)) {
       Alert.alert("Невалидно име", "Моля, въведете трите си имена.");
       return;
     }
 
     const phoneRegex = /^(08[7-9]\d{7}|\+3598[7-9]\d{7})$/;
+
     if (!phoneRegex.test(trimmedPhone)) {
       Alert.alert(
         "Невалиден телефон",
@@ -82,18 +138,25 @@ export default function EditProfileScreen() {
     try {
       setIsSaving(true);
 
-      const { data, error } = await supabase
+      let uploadedAvatarUrl = avatarUrl;
+
+      if (selectedAvatarUri) {
+        uploadedAvatarUrl = await uploadAvatar();
+      }
+
+      const { error } = await supabase
         .from("profiles")
         .update({
           full_name: trimmedName,
           phone: trimmedPhone,
+          avatar_url: uploadedAvatarUrl,
         })
-        .eq("id", user.id)
-        .select("full_name, phone")
-        .single();
+        .eq("id", user.id);
 
       if (error) throw error;
-      console.log("[PROFILE] Updated data:", data);
+
+      setAvatarUrl(uploadedAvatarUrl);
+      setSelectedAvatarUri(null);
 
       Alert.alert("Успех", "Личните данни са обновени.", [
         {
@@ -102,8 +165,10 @@ export default function EditProfileScreen() {
         },
       ]);
     } catch (error) {
-      console.error("[PROFILE] Failed to update:", error.message);
-      Alert.alert("Грешка", "Не успяхме да запазим личните данни.");
+      Alert.alert(
+        "Грешка",
+        error.message || "Не успяхме да запазим личните данни.",
+      );
     } finally {
       setIsSaving(false);
     }
@@ -140,6 +205,27 @@ export default function EditProfileScreen() {
         </View>
 
         <View style={styles.form}>
+          <View style={styles.avatarSection}>
+            <Pressable onPress={handlePickImage} style={styles.avatarButton}>
+              {selectedAvatarUri || avatarUrl ? (
+                <Image
+                  source={{ uri: selectedAvatarUri || avatarUrl }}
+                  style={styles.avatar}
+                />
+              ) : (
+                <View style={styles.avatarPlaceholder}>
+                  <Ionicons name="person" size={42} color="#71809B" />
+                </View>
+              )}
+
+              <View style={styles.cameraIcon}>
+                <Ionicons name="camera" size={18} color="#FFFFFF" />
+              </View>
+            </Pressable>
+
+            <Text style={styles.avatarText}>Промени профилната снимка</Text>
+          </View>
+
           <Text style={styles.label}>Три имена</Text>
           <TextInput
             style={styles.input}
@@ -201,6 +287,45 @@ const createStyles = (width) =>
       fontSize: width < 380 ? 23 : 26,
       fontWeight: "800",
       color: "#233D8B",
+    },
+    avatarSection: {
+      alignItems: "center",
+      marginBottom: 12,
+    },
+    avatarButton: {
+      position: "relative",
+    },
+    avatar: {
+      width: 110,
+      height: 110,
+      borderRadius: 55,
+    },
+    avatarPlaceholder: {
+      width: 110,
+      height: 110,
+      borderRadius: 55,
+      backgroundColor: "#E2E8F0",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    cameraIcon: {
+      position: "absolute",
+      right: 0,
+      bottom: 0,
+      backgroundColor: "#233D8B",
+      width: 34,
+      height: 34,
+      borderRadius: 17,
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 2,
+      borderColor: "#FFFFFF",
+    },
+    avatarText: {
+      marginTop: 10,
+      color: "#233D8B",
+      fontWeight: "600",
+      fontSize: 13,
     },
     form: {
       backgroundColor: "#FFFFFF",

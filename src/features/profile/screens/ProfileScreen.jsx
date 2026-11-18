@@ -7,6 +7,7 @@ import {
   useWindowDimensions,
   Pressable,
   Alert,
+  Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "../../auth/context/AuthContext";
@@ -44,7 +45,7 @@ export default function ProfileScreen() {
 
           const { data, error } = await supabase
             .from("profiles")
-            .select("full_name, phone")
+            .select("full_name, phone, avatar_url")
             .eq("id", user?.id)
             .single();
 
@@ -131,11 +132,24 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>Моят профил</Text>
+        <View style={styles.header}>
+          <Pressable onPress={() => router.back()} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color="#233D8B" />
+          </Pressable>
+          <Text style={styles.title}>Моят профил</Text>
+        </View>
+
         <Pressable style={styles.profileCard}>
           <View style={styles.profileHeader}>
             <View style={styles.avatar}>
-              <Text style={styles.initials}>{initials}</Text>
+              {profile?.avatar_url ? (
+                <Image
+                  source={{ uri: profile.avatar_url }}
+                  style={styles.avatar}
+                />
+              ) : (
+                <Text style={styles.initials}>{initials}</Text>
+              )}
             </View>
 
             <View style={styles.profileInfo}>
@@ -208,11 +222,19 @@ const createStyles = (width) =>
       paddingHorizontal: width < 380 ? 16 : width < 600 ? 24 : 32,
       paddingTop: width < 380 ? 16 : 20,
     },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
+      marginBottom: width < 380 ? 18 : 24,
+    },
+    backButton: {
+      padding: 4,
+    },
     title: {
       fontSize: width < 380 ? 23 : 26,
       fontWeight: "800",
       color: "#233D8B",
-      marginBottom: width < 380 ? 18 : 24,
     },
     profileCard: {
       backgroundColor: "#FFFFFF",
@@ -235,6 +257,7 @@ const createStyles = (width) =>
       backgroundColor: "#E8EEFF",
       justifyContent: "center",
       alignItems: "center",
+      overflow: "hidden",
     },
     initials: {
       fontSize: width < 380 ? 17 : 20,
@@ -243,7 +266,7 @@ const createStyles = (width) =>
     },
     profileInfo: {
       flex: 1,
-      gap: 4,
+      gap: 6,
       minWidth: 0,
     },
     profileDetails: {
@@ -255,9 +278,22 @@ const createStyles = (width) =>
       borderTopWidth: 1,
       borderTopColor: "#E8EEFF",
     },
+    name: {
+      fontSize: width < 380 ? 15 : 17,
+      fontWeight: "800",
+      color: "#233D8B",
+      letterSpacing: 0.2,
+    },
+    email: {
+      fontSize: width < 380 ? 12 : 13,
+      fontWeight: "500",
+      color: "#71809B",
+    },
     phone: {
-      fontSize: width < 380 ? 12 : 14,
-      color: "#64748B",
+      fontSize: width < 380 ? 14 : 15,
+      fontWeight: "600",
+      color: "#52658A",
+      letterSpacing: 0.3,
     },
     section: {
       marginTop: width < 380 ? 8 : 12,
