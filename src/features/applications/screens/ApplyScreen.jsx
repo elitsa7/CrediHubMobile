@@ -10,10 +10,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from "expo-router";
+import { supabase } from "../../../lib/supabase";
+
 import { useAuth } from "../../auth/context/AuthContext";
 import ApplicationReview from "../components/ApplicationReview";
 import ApplicationFormStep from "../components/ApplicationFormStep";
-import { supabase } from "../../../lib/supabase";
+import ApplicationSuccess from "../components/ApplicationSuccess";
 
 export default function ApplyScreen() {
   const { width } = useWindowDimensions();
@@ -33,6 +35,8 @@ export default function ApplyScreen() {
   const [isLoading, setIsLoading] = useState(true);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [applicationId, setApplicationId] = useState(null);
 
   const [profile, setProfile] = useState({
     fullName: "",
@@ -124,19 +128,26 @@ export default function ApplyScreen() {
     try {
       setIsSubmitting(true);
 
-      const { error } = await supabase.from("loan_applications").insert({
-        user_id: user.id,
-        requested_amount: loan.amount,
-        annual_interest_rate: loan.annualRate,
-        term_months: loan.months,
-        monthly_income: Number(monthlyIncome.replace(",", ".")),
-        monthly_payment: loan.monthlyPayment,
-        loan_purpose: loanPurpose,
-        workplace: workplace.trim(),
-        employment_type: employmentType,
-      });
+      const { data, error } = await supabase
+        .from("loan_applications")
+        .insert({
+          user_id: user.id,
+          requested_amount: loan.amount,
+          annual_interest_rate: loan.annualRate,
+          term_months: loan.months,
+          monthly_income: Number(monthlyIncome.replace(",", ".")),
+          monthly_payment: loan.monthlyPayment,
+          loan_purpose: loanPurpose,
+          workplace: workplace.trim(),
+          employment_type: employmentType,
+        })
+        .select("id")
+        .single();
 
       if (error) throw error;
+
+      setApplicationId(data.id);
+      setStep(3);
 
       setStep(3);
     } catch (error) {
@@ -223,6 +234,13 @@ export default function ApplyScreen() {
                 onBack={() => setStep(1)}
                 onSubmit={handleSubmit}
                 isSubmitting={isSubmitting}
+              />
+            )}
+
+            {step === 3 && (
+              <ApplicationSuccess
+                applicationId={applicationId}
+                onHome={() => router.replace("/home")}
               />
             )}
           </>
