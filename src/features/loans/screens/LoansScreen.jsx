@@ -4,17 +4,45 @@ import {
   StyleSheet,
   ActivityIndicator,
   FlatList,
+  Pressable,
   RefreshControl,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useLoans } from "../hooks/useLoans";
+import { useResponsive } from "../../../utils/responsive";
 
 export default function LoansScreen() {
   const { loans, isLoading, error, refreshing, refreshLoans } = useLoans();
+  const router = useRouter();
+
+  const {
+    horizontalPadding,
+    contentMaxWidth,
+    cardPadding,
+    moderateScale,
+    sectionGap,
+  } = useResponsive();
+
+  const styles = createStyles({
+    horizontalPadding,
+    contentMaxWidth,
+    cardPadding,
+    moderateScale,
+    sectionGap,
+  });
 
   const renderLoan = ({ item }) => (
-    <View style={styles.loanCard}>
+    <Pressable
+      style={styles.loanCard}
+      onPress={() =>
+        router.push({
+          pathname: "/loans/[id]",
+          params: { id: item.id },
+        })
+      }
+    >
       <View style={styles.cardHeader}>
         <View style={styles.iconContainer}>
           <Ionicons name="wallet-outline" size={24} color="#233D8B" />
@@ -38,17 +66,17 @@ export default function LoansScreen() {
       <View style={styles.divider} />
 
       <View style={styles.details}>
-        <View>
+        <View style={styles.detailColumn}>
           <Text style={styles.label}>Годишна лихва</Text>
           <Text style={styles.detailValue}>{item.annual_interest_rate}%</Text>
         </View>
 
-        <View>
+        <View style={styles.detailColumn}>
           <Text style={styles.label}>Срок</Text>
           <Text style={styles.detailValue}>{item.term_months} месеца</Text>
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 
   return (
@@ -98,101 +126,124 @@ export default function LoansScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#bac8e0",
-    paddingHorizontal: 20,
-  },
-  header: {
-    paddingTop: 20,
-    paddingBottom: 24,
-  },
-  title: {
-    fontSize: 27,
-    fontWeight: "800",
-    color: "#233D8B",
-  },
-  subtitle: {
-    fontSize: 14,
-    color: "#64748B",
-    marginTop: 6,
-  },
-  loanCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 16,
-  },
-  cardHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  iconContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: "#E8EEFF",
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 12,
-  },
-  loanName: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#233D8B",
-  },
-  label: {
-    fontSize: 13,
-    color: "#64748B",
-  },
-  amount: {
-    fontSize: 27,
-    fontWeight: "800",
-    color: "#172554",
-    marginTop: 5,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#E2E8F0",
-    marginVertical: 18,
-  },
-  details: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  detailValue: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: "#233D8B",
-    marginTop: 6,
-  },
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 20,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#233D8B",
-    marginTop: 16,
-  },
-  message: {
-    fontSize: 14,
-    color: "#64748B",
-    textAlign: "center",
-    marginTop: 10,
-  },
-  error: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#DC2626",
-    marginTop: 12,
-  },
-  list: {
-    paddingBottom: 24,
-  },
-});
+const createStyles = ({
+  horizontalPadding,
+  contentMaxWidth,
+  cardPadding,
+  moderateScale,
+  sectionGap,
+}) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: "#bac8e0",
+      paddingHorizontal: horizontalPadding,
+      width: "100%",
+      maxWidth: contentMaxWidth,
+      alignSelf: "center",
+    },
+    header: {
+      paddingTop: moderateScale(20),
+      paddingBottom: moderateScale(24),
+    },
+    title: {
+      fontSize: moderateScale(27),
+      fontWeight: "800",
+      color: "#233D8B",
+    },
+    subtitle: {
+      fontSize: moderateScale(14),
+      color: "#64748B",
+      marginTop: 6,
+    },
+    loanCard: {
+      backgroundColor: "#FFFFFF",
+      borderRadius: 20,
+      padding: cardPadding,
+      marginBottom: sectionGap,
+    },
+    cardHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: sectionGap,
+    },
+    iconContainer: {
+      width: 44,
+      height: 44,
+      flexShrink: 0,
+      borderRadius: 14,
+      backgroundColor: "#E8EEFF",
+      justifyContent: "center",
+      alignItems: "center",
+      marginRight: 12,
+    },
+    loanName: {
+      flex: 1,
+      minWidth: 0,
+      flexShrink: 1,
+      fontSize: moderateScale(16),
+      fontWeight: "700",
+      color: "#233D8B",
+    },
+    label: {
+      fontSize: moderateScale(13),
+      color: "#64748B",
+    },
+    amount: {
+      fontSize: moderateScale(27),
+      fontWeight: "800",
+      color: "#172554",
+      marginTop: 5,
+      flexShrink: 1,
+    },
+    divider: {
+      height: 1,
+      backgroundColor: "#E2E8F0",
+      marginVertical: 18,
+    },
+    details: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "space-between",
+      gap: 16,
+    },
+    detailColumn: {
+      flex: 1,
+      minWidth: 110,
+    },
+    detailValue: {
+      fontSize: moderateScale(15),
+      fontWeight: "700",
+      color: "#233D8B",
+      marginTop: 6,
+    },
+    center: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      paddingHorizontal: horizontalPadding,
+    },
+    emptyTitle: {
+      fontSize: moderateScale(18),
+      fontWeight: "700",
+      color: "#233D8B",
+      marginTop: 16,
+      textAlign: "center",
+    },
+    message: {
+      fontSize: moderateScale(14),
+      color: "#64748B",
+      textAlign: "center",
+      marginTop: 10,
+    },
+    error: {
+      fontSize: moderateScale(16),
+      fontWeight: "700",
+      color: "#DC2626",
+      marginTop: 12,
+      textAlign: "center",
+    },
+    list: {
+      paddingBottom: 24,
+    },
+  });

@@ -12,10 +12,20 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   Platform,
-  useWindowDimensions,
 } from "react-native";
+import { useResponsive } from "../../../utils/responsive";
 
 export default function RegisterScreen() {
+  const { isSmallPhone, isCompactHeight, horizontalPadding, moderateScale } =
+    useResponsive();
+
+  const styles = createStyles({
+    isSmallPhone,
+    isCompactHeight,
+    horizontalPadding,
+    moderateScale,
+  });
+
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -23,9 +33,6 @@ export default function RegisterScreen() {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [emailAlreadyExists, setEmailAlreadyExists] = useState(false);
-
-  const { width, height } = useWindowDimensions();
-  const styles = createStyles(width, height);
 
   const router = useRouter();
 
@@ -218,10 +225,13 @@ export default function RegisterScreen() {
   );
 }
 
-const createStyles = (width, height) => {
-  const horizontalPadding = width < 380 ? 16 : width < 600 ? 24 : 40;
-
-  return StyleSheet.create({
+const createStyles = ({
+  isSmallPhone,
+  isCompactHeight,
+  horizontalPadding,
+  moderateScale,
+}) =>
+  StyleSheet.create({
     keyboardContainer: {
       flex: 1,
       backgroundColor: "#BAC8E0",
@@ -234,19 +244,19 @@ const createStyles = (width, height) => {
       flex: 1,
       justifyContent: "center",
       paddingHorizontal: horizontalPadding,
-      paddingVertical: height < 700 ? 24 : 40,
+      paddingVertical: isCompactHeight ? 24 : 40,
     },
     title: {
-      fontSize: width < 380 ? 30 : 34,
+      fontSize: moderateScale(isSmallPhone ? 30 : 34),
       fontWeight: "bold",
       color: "#10285C",
       textAlign: "center",
       marginBottom: 10,
     },
     subtitle: {
-      fontSize: 18,
+      fontSize: moderateScale(18),
       textAlign: "center",
-      marginBottom: 35,
+      marginBottom: isCompactHeight ? 24 : 35,
       color: "#10285C",
     },
     input: {
@@ -254,7 +264,7 @@ const createStyles = (width, height) => {
       borderRadius: 12,
       padding: 16,
       marginBottom: 16,
-      fontSize: 16,
+      fontSize: moderateScale(16),
     },
     button: {
       backgroundColor: "#10285C",
@@ -265,38 +275,38 @@ const createStyles = (width, height) => {
     },
     buttonText: {
       color: "#FFFFFF",
-      fontSize: 17,
+      fontSize: moderateScale(17),
       fontWeight: "bold",
     },
     loginContainer: {
       flexDirection: "row",
       justifyContent: "center",
       alignItems: "center",
-      marginTop: 25,
+      marginTop: isCompactHeight ? 18 : 25,
       gap: 5,
+      flexWrap: "wrap",
     },
     loginText: {
       color: "#10285C",
-      fontSize: 14,
+      fontSize: moderateScale(14),
     },
     loginLink: {
       color: "#2457B5",
-      fontSize: 14,
+      fontSize: moderateScale(14),
       fontWeight: "bold",
       textDecorationLine: "underline",
     },
     errorText: {
       color: "#D32F2F",
-      fontSize: 14,
+      fontSize: moderateScale(14),
       marginBottom: 12,
       marginLeft: 4,
     },
     successText: {
       color: "#176B45",
-      fontSize: 14,
+      fontSize: moderateScale(14),
       marginBottom: 12,
       marginLeft: 4,
       textAlign: "center",
     },
   });
-};

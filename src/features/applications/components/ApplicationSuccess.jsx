@@ -1,7 +1,17 @@
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useResponsive } from "../../../utils/responsive";
 
 export default function ApplicationSuccess({ applicationId, result, onHome }) {
+  const { isSmallPhone, cardPadding, moderateScale, sectionGap } =
+    useResponsive();
+
+  const styles = createStyles({
+    isSmallPhone,
+    cardPadding,
+    moderateScale,
+    sectionGap,
+  });
   const isApproved = result?.status === "approved";
   const isRejected = result?.status === "rejected";
   const statusConfig = isApproved
@@ -76,98 +86,106 @@ export default function ApplicationSuccess({ applicationId, result, onHome }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    paddingTop: 45,
-    paddingBottom: 30,
-    gap: 18,
-  },
-  iconContainer: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "800",
-    color: "#233D8B",
-    textAlign: "center",
-  },
-  subtitle: {
-    fontSize: 14,
-    lineHeight: 22,
-    color: "#475569",
-    textAlign: "center",
-    paddingHorizontal: 12,
-  },
-  card: {
-    width: "100%",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 18,
-    padding: 20,
-    gap: 12,
-    marginTop: 10,
-  },
-  label: {
-    fontSize: 13,
-    color: "#64748B",
-  },
-  applicationId: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#233D8B",
-  },
-  statusRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    marginTop: 5,
-  },
-  statusDot: {
-    width: 9,
-    height: 9,
-    borderRadius: 5,
-  },
-  statusText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#64748B",
-  },
-  reasonContainer: {
-    borderTopWidth: 1,
-    borderTopColor: "#E2E8F0",
-    paddingTop: 12,
-    gap: 5,
-  },
-  reasonTitle: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: "#233D8B",
-  },
-  reasonText: {
-    fontSize: 13,
-    lineHeight: 20,
-    color: "#475569",
-  },
-  button: {
-    width: "100%",
-    backgroundColor: "#233D8B",
-    paddingVertical: 16,
-    borderRadius: 14,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
-    marginTop: 8,
-  },
-  buttonText: {
-    color: "#FFFFFF",
-    fontSize: 15,
-    fontWeight: "700",
-  },
-});
+const createStyles = ({
+  isSmallPhone,
+  cardPadding,
+  moderateScale,
+  sectionGap,
+}) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      alignItems: "center",
+      paddingTop: moderateScale(45),
+      paddingBottom: 30,
+      paddingHorizontal: cardPadding,
+      gap: sectionGap,
+    },
+    iconContainer: {
+      width: moderateScale(90),
+      height: moderateScale(90),
+      borderRadius: moderateScale(45),
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    title: {
+      fontSize: moderateScale(isSmallPhone ? 21 : 24),
+      fontWeight: "800",
+      color: "#233D8B",
+      textAlign: "center",
+    },
+    subtitle: {
+      fontSize: moderateScale(14),
+      lineHeight: moderateScale(22),
+      color: "#475569",
+      textAlign: "center",
+      paddingHorizontal: 12,
+    },
+    card: {
+      width: "100%",
+      backgroundColor: "#FFFFFF",
+      borderRadius: 18,
+      padding: cardPadding,
+      gap: 12,
+      marginTop: 10,
+    },
+    label: {
+      fontSize: moderateScale(13),
+      color: "#64748B",
+    },
+    applicationId: {
+      fontSize: moderateScale(14),
+      fontWeight: "700",
+      color: "#233D8B",
+    },
+    statusRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      marginTop: 5,
+      flexWrap: "wrap",
+    },
+    statusDot: {
+      width: 9,
+      height: 9,
+      borderRadius: 5,
+    },
+    statusText: {
+      fontSize: moderateScale(13),
+      fontWeight: "600",
+      color: "#64748B",
+      flexShrink: 1,
+    },
+    reasonContainer: {
+      borderTopWidth: 1,
+      borderTopColor: "#E2E8F0",
+      paddingTop: 12,
+      gap: 5,
+    },
+    reasonTitle: {
+      fontSize: moderateScale(13),
+      fontWeight: "700",
+      color: "#233D8B",
+    },
+    reasonText: {
+      fontSize: moderateScale(13),
+      lineHeight: moderateScale(20),
+      color: "#475569",
+    },
+    button: {
+      width: "100%",
+      backgroundColor: "#233D8B",
+      paddingVertical: moderateScale(16),
+      borderRadius: 14,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 10,
+      marginTop: 8,
+    },
+    buttonText: {
+      color: "#FFFFFF",
+      fontSize: moderateScale(15),
+      fontWeight: "700",
+    },
+  });

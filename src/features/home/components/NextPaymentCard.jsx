@@ -1,9 +1,17 @@
 import { Ionicons } from "@expo/vector-icons";
-import { View, Text, StyleSheet, useWindowDimensions } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
+import { useResponsive } from "../../../utils/responsive";
 
 export default function NextPaymentCard() {
-  const { width } = useWindowDimensions();
-  const styles = createStyles(width);
+  const { isSmallPhone, cardPadding, moderateScale, sectionGap } =
+    useResponsive();
+
+  const styles = createStyles({
+    isSmallPhone,
+    cardPadding,
+    moderateScale,
+    sectionGap,
+  });
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -40,13 +48,18 @@ export default function NextPaymentCard() {
   );
 }
 
-const createStyles = (width) =>
+const createStyles = ({
+  isSmallPhone,
+  cardPadding,
+  moderateScale,
+  sectionGap,
+}) =>
   StyleSheet.create({
     container: {
       backgroundColor: "#FFFFFF",
       borderRadius: 20,
-      padding: 20,
-      marginTop: 24,
+      padding: cardPadding,
+      marginTop: sectionGap,
     },
     header: {
       flexDirection: "column",
@@ -55,13 +68,13 @@ const createStyles = (width) =>
       marginBottom: 18,
     },
     label: {
-      fontSize: width < 380 ? 12 : 13,
+      fontSize: moderateScale(isSmallPhone ? 12 : 13),
       fontWeight: "700",
       color: "#64748b",
       letterSpacing: 1,
     },
     subtitle: {
-      fontSize: width < 380 ? 13 : 14,
+      fontSize: moderateScale(isSmallPhone ? 13 : 14),
       color: "#10285C",
       marginTop: 4,
       fontWeight: "600",
@@ -75,7 +88,7 @@ const createStyles = (width) =>
       marginBottom: 16,
     },
     statusText: {
-      fontSize: 11,
+      fontSize: moderateScale(11),
       fontWeight: "600",
       color: "#92400E",
     },
@@ -83,12 +96,12 @@ const createStyles = (width) =>
       marginBottom: 18,
     },
     amountLabel: {
-      fontSize: 13,
+      fontSize: moderateScale(13),
       color: "#64748b",
       marginBottom: 6,
     },
     amount: {
-      fontSize: width < 380 ? 28 : 34,
+      fontSize: moderateScale(isSmallPhone ? 28 : 34),
       fontWeight: "700",
       color: "#10285C",
     },
@@ -100,10 +113,12 @@ const createStyles = (width) =>
       flexDirection: "row",
       alignItems: "center",
       gap: 10,
+      flexWrap: "wrap",
     },
     infoText: {
-      fontSize: width < 380 ? 12 : 14,
+      fontSize: moderateScale(isSmallPhone ? 12 : 14),
       color: "#475569",
+      flexShrink: 1,
     },
     progressContainer: {
       marginTop: 4,
@@ -115,12 +130,12 @@ const createStyles = (width) =>
       marginBottom: 10,
     },
     progressLabel: {
-      fontSize: 13,
+      fontSize: moderateScale(13),
       fontWeight: "600",
       color: "#475569",
     },
     progressPercentage: {
-      fontSize: 13,
+      fontSize: moderateScale(13),
       fontWeight: "700",
       color: "#10285C",
     },

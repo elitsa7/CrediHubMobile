@@ -6,23 +6,30 @@ import {
   Pressable,
   ActivityIndicator,
   Alert,
-  useWindowDimensions,
   ScrollView,
   Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "../../auth/context/AuthContext";
 import { supabase } from "../../../lib/supabase";
+import { useResponsive } from "../../../utils/responsive";
 import { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 
 export default function EditProfileScreen() {
+  const { isSmallPhone, horizontalPadding, cardPadding, moderateScale } =
+    useResponsive();
+
+  const styles = createStyles({
+    isSmallPhone,
+    horizontalPadding,
+    cardPadding,
+    moderateScale,
+  });
   const { user } = useAuth();
   const router = useRouter();
-  const { width } = useWindowDimensions();
-  const styles = createStyles(width);
 
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
@@ -265,8 +272,12 @@ export default function EditProfileScreen() {
     </SafeAreaView>
   );
 }
-
-const createStyles = (width) =>
+const createStyles = ({
+  isSmallPhone,
+  horizontalPadding,
+  cardPadding,
+  moderateScale,
+}) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -274,17 +285,18 @@ const createStyles = (width) =>
     },
     content: {
       flexGrow: 1,
-      padding: width * 0.05,
+      paddingHorizontal: horizontalPadding,
+      paddingTop: moderateScale(16),
       paddingBottom: 30,
     },
     header: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 16,
-      marginBottom: 25,
+      gap: moderateScale(16),
+      marginBottom: moderateScale(25),
     },
     title: {
-      fontSize: width < 380 ? 23 : 26,
+      fontSize: moderateScale(isSmallPhone ? 23 : 26),
       fontWeight: "800",
       color: "#233D8B",
     },
@@ -296,14 +308,14 @@ const createStyles = (width) =>
       position: "relative",
     },
     avatar: {
-      width: 110,
-      height: 110,
-      borderRadius: 55,
+      width: moderateScale(110),
+      height: moderateScale(110),
+      borderRadius: moderateScale(55),
     },
     avatarPlaceholder: {
-      width: 110,
-      height: 110,
-      borderRadius: 55,
+      width: moderateScale(110),
+      height: moderateScale(110),
+      borderRadius: moderateScale(55),
       backgroundColor: "#E2E8F0",
       alignItems: "center",
       justifyContent: "center",
@@ -313,9 +325,9 @@ const createStyles = (width) =>
       right: 0,
       bottom: 0,
       backgroundColor: "#233D8B",
-      width: 34,
-      height: 34,
-      borderRadius: 17,
+      width: moderateScale(34),
+      height: moderateScale(34),
+      borderRadius: moderateScale(17),
       alignItems: "center",
       justifyContent: "center",
       borderWidth: 2,
@@ -325,11 +337,11 @@ const createStyles = (width) =>
       marginTop: 10,
       color: "#233D8B",
       fontWeight: "600",
-      fontSize: 13,
+      fontSize: moderateScale(13),
     },
     form: {
       backgroundColor: "#FFFFFF",
-      padding: width < 380 ? 16 : 22,
+      padding: cardPadding,
       borderRadius: 18,
       gap: 12,
       width: "100%",
@@ -337,7 +349,7 @@ const createStyles = (width) =>
       alignSelf: "center",
     },
     label: {
-      fontSize: 14,
+      fontSize: moderateScale(14),
       fontWeight: "700",
       color: "#233D8B",
     },
@@ -345,21 +357,21 @@ const createStyles = (width) =>
       borderWidth: 1,
       borderColor: "#CBD5E1",
       borderRadius: 10,
-      padding: 13,
-      fontSize: 15,
+      padding: moderateScale(13),
+      fontSize: moderateScale(15),
       color: "#1E293B",
     },
     saveButton: {
       backgroundColor: "#233D8B",
       borderRadius: 12,
-      padding: 15,
+      padding: moderateScale(15),
       alignItems: "center",
       marginTop: 12,
     },
     saveText: {
       color: "#FFFFFF",
       fontWeight: "700",
-      fontSize: 15,
+      fontSize: moderateScale(15),
     },
     footer: {
       flexDirection: "row",
@@ -371,6 +383,6 @@ const createStyles = (width) =>
     },
     footerText: {
       color: "#71809B",
-      fontSize: 12,
+      fontSize: moderateScale(12),
     },
   });

@@ -6,31 +6,23 @@ import {
   Pressable,
   StyleSheet,
 } from "react-native";
-import { useLoans } from "../../loans/hooks/useLoans";
 import { useRouter } from "expo-router";
+import { useResponsive } from "../../../utils/responsive";
+import { useLoans } from "../../loans/hooks/useLoans";
 
 export default function FinanceSummary() {
   const { loans, isLoading, error } = useLoans();
   const router = useRouter();
-  console.log(
-    "[FINANCE SUMMARY]",
-    loans.map((loan) => ({
-      id: loan.id,
-      name: loan.name,
-      principal: loan.principal_amount,
-      installmentsCount: loan.installments?.length ?? 0,
-      remaining: (loan.installments ?? []).reduce(
-        (sum, installment) =>
-          sum +
-          Math.max(
-            0,
-            Number(installment.total_amount || 0) -
-              Number(installment.paid_amount || 0),
-          ),
-        0,
-      ),
-    })),
-  );
+  const { isSmallPhone, isTablet, cardPadding, moderateScale, sectionGap } =
+    useResponsive();
+
+  const styles = createStyles({
+    isSmallPhone,
+    isTablet,
+    cardPadding,
+    moderateScale,
+    sectionGap,
+  });
 
   const activeLoans = loans.filter((loan) => loan.status === "active").length;
 
@@ -94,53 +86,64 @@ export default function FinanceSummary() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    marginTop: 28,
-  },
-  cardsContainer: {
-    flexDirection: "row",
-    gap: 12,
-  },
-  financeCard: {
-    flex: 1,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    padding: 16,
-    minHeight: 145,
-    justifyContent: "space-between",
-    shadowColor: "#233D8B",
-    shadowOffset: {
-      width: 0,
-      height: 3,
+const createStyles = ({
+  isSmallPhone,
+  isTablet,
+  cardPadding,
+  moderateScale,
+  sectionGap,
+}) =>
+  StyleSheet.create({
+    container: {
+      marginTop: moderateScale(28),
     },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  iconContainer: {
-    width: 38,
-    height: 38,
-    borderRadius: 12,
-    backgroundColor: "#E8EEFF",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  cardLabel: {
-    fontSize: 12,
-    fontWeight: "500",
-    color: "#64748B",
-    marginBottom: 8,
-  },
-  value: {
-    fontSize: 23,
-    fontWeight: "800",
-    color: "#233D8B",
-  },
-  error: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#DC2626",
-  },
-});
+    cardsContainer: {
+      flexDirection: isSmallPhone ? "column" : "row",
+      flexWrap: "wrap",
+      gap: sectionGap,
+    },
+    financeCard: {
+      flex: isSmallPhone ? undefined : 1,
+      width: isSmallPhone ? "100%" : undefined,
+      minWidth: isTablet ? 220 : 0,
+      backgroundColor: "#FFFFFF",
+      borderRadius: 20,
+      padding: cardPadding,
+      minHeight: isSmallPhone ? 130 : 145,
+      justifyContent: "space-between",
+      shadowColor: "#233D8B",
+      shadowOffset: {
+        width: 0,
+        height: 3,
+      },
+      shadowOpacity: 0.08,
+      shadowRadius: 8,
+      elevation: 3,
+    },
+    iconContainer: {
+      width: 38,
+      height: 38,
+      borderRadius: 12,
+      backgroundColor: "#E8EEFF",
+      justifyContent: "center",
+      alignItems: "center",
+      marginBottom: 12,
+    },
+    cardLabel: {
+      fontSize: moderateScale(12),
+      fontWeight: "500",
+      color: "#64748B",
+      marginBottom: 8,
+    },
+    value: {
+      fontSize: moderateScale(23),
+      fontWeight: "800",
+      color: "#233D8B",
+      flexShrink: 1,
+    },
+    error: {
+      fontSize: moderateScale(22),
+      fontWeight: "700",
+      color: "#DC2626",
+    },
+  });

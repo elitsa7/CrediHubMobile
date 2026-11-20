@@ -6,7 +6,6 @@ import {
   Pressable,
   ActivityIndicator,
   Alert,
-  useWindowDimensions,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
@@ -16,14 +15,29 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "../../auth/context/AuthContext";
 import { supabase } from "../../../lib/supabase";
 import { useState } from "react";
+import { useResponsive } from "../../../utils/responsive";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
 export default function SecurityScreen() {
+  const {
+    isSmallPhone,
+    horizontalPadding,
+    cardPadding,
+    moderateScale,
+    sectionGap,
+  } = useResponsive();
+
+  const styles = createStyles({
+    isSmallPhone,
+    horizontalPadding,
+    cardPadding,
+    moderateScale,
+    sectionGap,
+  });
+
   const { user } = useAuth();
   const router = useRouter();
-  const { width } = useWindowDimensions();
-  const styles = createStyles(width);
 
   const [newEmail, setNewEmail] = useState("");
   const [isUpdatingEmail, setIsUpdatingEmail] = useState(false);
@@ -422,10 +436,16 @@ export default function SecurityScreen() {
   );
 }
 
-const createStyles = (width) =>
+const createStyles = ({
+  isSmallPhone,
+  horizontalPadding,
+  cardPadding,
+  moderateScale,
+  sectionGap,
+}) =>
   StyleSheet.create({
     mainContent: {
-      gap: 20,
+      gap: sectionGap,
     },
     keyboardArea: {
       flex: 1,
@@ -439,19 +459,21 @@ const createStyles = (width) =>
     },
     content: {
       flexGrow: 1,
-      padding: width * 0.05,
-      paddingBottom: 30,
+      paddingHorizontal: horizontalPadding,
+      paddingTop: moderateScale(16),
+      paddingBottom: moderateScale(30),
     },
     header: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 16,
+      gap: moderateScale(16),
       marginBottom: 5,
     },
     title: {
-      fontSize: 25,
+      fontSize: moderateScale(isSmallPhone ? 22 : 25),
       fontWeight: "800",
       color: "#233D8B",
+      flexShrink: 1,
     },
     backButton: {
       padding: 5,
@@ -459,20 +481,20 @@ const createStyles = (width) =>
     headerText: {
       flex: 1,
       gap: 3,
+      minWidth: 0,
     },
     infoBox: {
       backgroundColor: "#233D8B",
       borderRadius: 18,
-      padding: 18,
+      padding: cardPadding,
       flexDirection: "row",
       alignItems: "center",
-      gap: 14,
-      marginBottom: 30,
+      gap: moderateScale(14),
+      marginBottom: moderateScale(30),
     },
-
     infoIcon: {
-      width: 48,
-      height: 48,
+      width: moderateScale(48),
+      height: moderateScale(48),
       borderRadius: 15,
       backgroundColor: "#FFFFFF",
       alignItems: "center",
@@ -481,20 +503,23 @@ const createStyles = (width) =>
     infoText: {
       flex: 1,
       gap: 5,
+      minWidth: 0,
     },
     infoTitle: {
       color: "#FFFFFF",
-      fontSize: 16,
+      fontSize: moderateScale(16),
       fontWeight: "700",
+      flexShrink: 1,
     },
     infoDescription: {
       color: "#DCE5FA",
-      fontSize: 12,
-      lineHeight: 18,
+      fontSize: moderateScale(12),
+      lineHeight: moderateScale(18),
+      flexShrink: 1,
     },
     sectionHeading: {
       color: "#52627D",
-      fontSize: 12,
+      fontSize: moderateScale(12),
       fontWeight: "800",
       letterSpacing: 1,
       marginBottom: 12,
@@ -503,23 +528,23 @@ const createStyles = (width) =>
     settingsCard: {
       backgroundColor: "#FFFFFF",
       borderRadius: 20,
-      paddingHorizontal: 17,
+      paddingHorizontal: cardPadding,
       paddingVertical: 5,
     },
     separator: {
       height: 1,
       backgroundColor: "#E9EDF4",
-      marginLeft: 56,
+      marginLeft: moderateScale(56),
     },
     settingRow: {
       flexDirection: "row",
       alignItems: "center",
-      paddingVertical: 17,
-      gap: 12,
+      paddingVertical: moderateScale(17),
+      gap: moderateScale(12),
     },
     settingIcon: {
-      width: 44,
-      height: 44,
+      width: moderateScale(44),
+      height: moderateScale(44),
       borderRadius: 14,
       backgroundColor: "#EAF0FC",
       alignItems: "center",
@@ -528,22 +553,25 @@ const createStyles = (width) =>
     settingInfo: {
       flex: 1,
       gap: 5,
+      minWidth: 0,
     },
     settingTitle: {
-      fontSize: 15,
+      fontSize: moderateScale(15),
       fontWeight: "700",
       color: "#233D8B",
+      flexShrink: 1,
     },
     settingValue: {
-      fontSize: 12,
+      fontSize: moderateScale(12),
       color: "#71809B",
+      flexShrink: 1,
     },
     actionButton: {
       paddingVertical: 9,
       paddingHorizontal: 10,
     },
     actionText: {
-      fontSize: 13,
+      fontSize: moderateScale(13),
       fontWeight: "700",
       color: "#3157B7",
     },
@@ -552,14 +580,12 @@ const createStyles = (width) =>
       paddingBottom: 20,
       gap: 10,
     },
-
     label: {
-      fontSize: 13,
+      fontSize: moderateScale(13),
       fontWeight: "600",
       color: "#52627D",
       marginTop: 5,
     },
-
     input: {
       backgroundColor: "#F5F7FB",
       borderWidth: 1,
@@ -567,7 +593,7 @@ const createStyles = (width) =>
       borderRadius: 12,
       paddingHorizontal: 14,
       paddingVertical: 12,
-      fontSize: 14,
+      fontSize: moderateScale(14),
       color: "#233D8B",
     },
     primaryButton: {
@@ -580,7 +606,7 @@ const createStyles = (width) =>
     },
     primaryButtonText: {
       color: "#FFFFFF",
-      fontSize: 14,
+      fontSize: moderateScale(14),
       fontWeight: "700",
     },
     passwordInputContainer: {
@@ -593,9 +619,10 @@ const createStyles = (width) =>
     },
     passwordInput: {
       flex: 1,
+      minWidth: 0,
       paddingHorizontal: 14,
       paddingVertical: 12,
-      fontSize: 14,
+      fontSize: moderateScale(14),
       color: "#233D8B",
     },
     eyeButton: {
@@ -603,8 +630,8 @@ const createStyles = (width) =>
       paddingVertical: 10,
     },
     passwordHint: {
-      fontSize: 11,
-      lineHeight: 16,
+      fontSize: moderateScale(11),
+      lineHeight: moderateScale(16),
       color: "#71809B",
       marginTop: 2,
     },
@@ -614,10 +641,13 @@ const createStyles = (width) =>
       justifyContent: "center",
       gap: 7,
       paddingVertical: 16,
+      paddingHorizontal: horizontalPadding,
       backgroundColor: "#bac8e0",
     },
     footerText: {
       color: "#71809B",
-      fontSize: 12,
+      fontSize: moderateScale(12),
+      flexShrink: 1,
+      textAlign: "center",
     },
   });

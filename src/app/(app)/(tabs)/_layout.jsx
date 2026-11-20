@@ -1,7 +1,10 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useResponsive } from "../../../utils/responsive";
 
 export default function TabsLayout() {
+  const { isSmallPhone, moderateScale } = useResponsive();
+
   return (
     <Tabs
       screenOptions={{
@@ -10,14 +13,14 @@ export default function TabsLayout() {
         tabBarInactiveTintColor: "#94A3B8",
         tabBarStyle: {
           backgroundColor: "#FFFFFF",
-          height: 65,
-          paddingBottom: 8,
-          paddingTop: 8,
+          height: moderateScale(isSmallPhone ? 60 : 65),
+          paddingBottom: moderateScale(isSmallPhone ? 6 : 8),
+          paddingTop: moderateScale(8),
           borderTopWidth: 0,
           elevation: 10,
         },
         tabBarLabelStyle: {
-          fontSize: 11,
+          fontSize: moderateScale(isSmallPhone ? 10 : 11),
           fontWeight: "600",
         },
       }}

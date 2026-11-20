@@ -1,5 +1,6 @@
 import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useResponsive } from "../../../utils/responsive";
 
 export default function ApplicationFormStep({
   profile,
@@ -14,6 +15,15 @@ export default function ApplicationFormStep({
   setLoanPurpose,
   onNext,
 }) {
+  const { isSmallPhone, cardPadding, moderateScale, sectionGap } =
+    useResponsive();
+
+  const styles = createStyles({
+    isSmallPhone,
+    cardPadding,
+    moderateScale,
+    sectionGap,
+  });
   const purposes = [
     "Ремонт на жилище",
     "Покупка на автомобил",
@@ -69,17 +79,22 @@ export default function ApplicationFormStep({
       <View style={styles.card}>
         {renderHeader("person-outline", "Лични данни")}
 
-        <InfoRow label="Три имена" value={profile.fullName} />
-        <InfoRow label="Телефон" value={profile.phone} />
-        <InfoRow label="Имейл" value={profile.email} />
+        <InfoRow styles={styles} label="Три имена" value={profile.fullName} />
+        <InfoRow styles={styles} label="Телефон" value={profile.phone} />
+        <InfoRow styles={styles} label="Имейл" value={profile.email} />
       </View>
 
       <View style={styles.card}>
         {renderHeader("wallet-outline", "Параметри на кредита")}
 
-        <LoanRow label="Желана сума" value={`${loan.amount.toFixed(2)} €`} />
-        <LoanRow label="Срок" value={`${loan.months} месеца`} />
         <LoanRow
+          styles={styles}
+          label="Желана сума"
+          value={`${loan.amount.toFixed(2)} €`}
+        />
+        <LoanRow styles={styles} label="Срок" value={`${loan.months} месеца`} />
+        <LoanRow
+          styles={styles}
           label="Годишна лихва"
           value={`${loan.annualRate.toFixed(2)} %`}
         />
@@ -149,7 +164,7 @@ export default function ApplicationFormStep({
   );
 }
 
-function InfoRow({ label, value }) {
+function InfoRow({ styles, label, value }) {
   return (
     <View style={styles.infoRow}>
       <Text style={styles.infoLabel}>{label}</Text>
@@ -158,7 +173,7 @@ function InfoRow({ label, value }) {
   );
 }
 
-function LoanRow({ label, value }) {
+function LoanRow({ styles, label, value }) {
   return (
     <View style={styles.loanRow}>
       <Text style={styles.loanLabel}>{label}</Text>
@@ -167,142 +182,156 @@ function LoanRow({ label, value }) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    gap: 10,
-  },
-  card: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 18,
-    padding: 16,
-    gap: 11,
-  },
-  cardHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    marginBottom: 3,
-  },
-  iconContainer: {
-    width: 36,
-    height: 36,
-    borderRadius: 11,
-    backgroundColor: "#EEF2FA",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#233D8B",
-  },
-  infoRow: {
-    gap: 4,
-    paddingBottom: 9,
-    borderBottomWidth: 1,
-    borderBottomColor: "#EEF1F6",
-  },
-  infoLabel: {
-    fontSize: 12,
-    color: "#64748B",
-  },
-  infoValue: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#334155",
-  },
-  loanRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 8,
-    paddingBottom: 9,
-    borderBottomWidth: 1,
-    borderBottomColor: "#EEF1F6",
-  },
-  loanLabel: {
-    fontSize: 13,
-    color: "#64748B",
-  },
-  loanValue: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#233D8B",
-  },
-  paymentRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingTop: 3,
-    gap: 8,
-  },
-  paymentLabel: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#233D8B",
-  },
-  paymentValue: {
-    fontSize: 19,
-    fontWeight: "800",
-    color: "#233D8B",
-  },
-  optionsContainer: {
-    gap: 5,
-  },
-  option: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    paddingVertical: 9,
-    paddingHorizontal: 10,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#EEF1F6",
-  },
-  optionActive: {
-    backgroundColor: "#EEF2FA",
-    borderColor: "#C7D2EA",
-  },
-  optionText: {
-    flex: 1,
-    fontSize: 14,
-    color: "#64748B",
-  },
-  optionTextActive: {
-    color: "#233D8B",
-    fontWeight: "700",
-  },
-  label: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#64748B",
-    marginTop: 3,
-    marginBottom: -4,
-  },
-  input: {
-    backgroundColor: "#F1F4F9",
-    borderWidth: 1,
-    borderColor: "#E2E8F0",
-    borderRadius: 11,
-    paddingHorizontal: 13,
-    paddingVertical: 12,
-    fontSize: 15,
-    color: "#334155",
-  },
-  nextButton: {
-    backgroundColor: "#233D8B",
-    paddingVertical: 15,
-    paddingHorizontal: 16,
-    borderRadius: 13,
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "row",
-    gap: 9,
-    marginTop: 3,
-  },
-  nextButtonText: {
-    color: "#FFFFFF",
-    fontSize: 15,
-    fontWeight: "700",
-  },
-});
+const createStyles = ({
+  isSmallPhone,
+  cardPadding,
+  moderateScale,
+  sectionGap,
+}) =>
+  StyleSheet.create({
+    container: {
+      gap: sectionGap / 2,
+    },
+    card: {
+      backgroundColor: "#FFFFFF",
+      borderRadius: 18,
+      padding: cardPadding,
+      gap: 11,
+    },
+    cardHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      marginBottom: 3,
+    },
+    iconContainer: {
+      width: moderateScale(36),
+      height: moderateScale(36),
+      borderRadius: moderateScale(11),
+      backgroundColor: "#EEF2FA",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    sectionTitle: {
+      fontSize: moderateScale(16),
+      fontWeight: "700",
+      color: "#233D8B",
+      flexShrink: 1,
+    },
+    infoRow: {
+      gap: 4,
+      paddingBottom: 9,
+      borderBottomWidth: 1,
+      borderBottomColor: "#EEF1F6",
+    },
+    infoLabel: {
+      fontSize: moderateScale(12),
+      color: "#64748B",
+    },
+    infoValue: {
+      fontSize: moderateScale(15),
+      fontWeight: "600",
+      color: "#334155",
+      flexShrink: 1,
+    },
+    loanRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      gap: 8,
+      paddingBottom: 9,
+      borderBottomWidth: 1,
+      borderBottomColor: "#EEF1F6",
+      flexWrap: "wrap",
+    },
+    loanLabel: {
+      fontSize: moderateScale(13),
+      color: "#64748B",
+      flexShrink: 1,
+    },
+    loanValue: {
+      fontSize: moderateScale(14),
+      fontWeight: "700",
+      color: "#233D8B",
+      flexShrink: 1,
+    },
+    paymentRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingTop: 3,
+      gap: 8,
+      flexWrap: "wrap",
+    },
+    paymentLabel: {
+      fontSize: moderateScale(14),
+      fontWeight: "700",
+      color: "#233D8B",
+      flexShrink: 1,
+    },
+    paymentValue: {
+      fontSize: moderateScale(isSmallPhone ? 17 : 19),
+      fontWeight: "800",
+      color: "#233D8B",
+    },
+    optionsContainer: {
+      gap: 5,
+    },
+    option: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      paddingVertical: moderateScale(9),
+      paddingHorizontal: 10,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: "#EEF1F6",
+    },
+    optionActive: {
+      backgroundColor: "#EEF2FA",
+      borderColor: "#C7D2EA",
+    },
+    optionText: {
+      flex: 1,
+      fontSize: moderateScale(14),
+      color: "#64748B",
+    },
+    optionTextActive: {
+      color: "#233D8B",
+      fontWeight: "700",
+    },
+    label: {
+      fontSize: moderateScale(13),
+      fontWeight: "600",
+      color: "#64748B",
+      marginTop: 3,
+      marginBottom: -4,
+    },
+    input: {
+      backgroundColor: "#F1F4F9",
+      borderWidth: 1,
+      borderColor: "#E2E8F0",
+      borderRadius: 11,
+      paddingHorizontal: 13,
+      paddingVertical: moderateScale(12),
+      fontSize: moderateScale(15),
+      color: "#334155",
+      width: "100%",
+    },
+    nextButton: {
+      backgroundColor: "#233D8B",
+      paddingVertical: moderateScale(15),
+      paddingHorizontal: 16,
+      borderRadius: 13,
+      alignItems: "center",
+      justifyContent: "center",
+      flexDirection: "row",
+      gap: 9,
+      marginTop: 3,
+    },
+    nextButtonText: {
+      color: "#FFFFFF",
+      fontSize: moderateScale(15),
+      fontWeight: "700",
+    },
+  });

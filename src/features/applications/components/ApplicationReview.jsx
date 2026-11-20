@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useResponsive } from "../../../utils/responsive";
 
 export default function ApplicationReview({
   profile,
@@ -12,6 +13,16 @@ export default function ApplicationReview({
   onSubmit,
   isSubmitting,
 }) {
+  const { isSmallPhone, cardPadding, moderateScale, sectionGap } =
+    useResponsive();
+
+  const styles = createStyles({
+    isSmallPhone,
+    cardPadding,
+    moderateScale,
+    sectionGap,
+  });
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Преглед на заявката</Text>
@@ -26,9 +37,9 @@ export default function ApplicationReview({
           <Text style={styles.sectionTitle}>Лични данни</Text>
         </View>
 
-        <ReviewRow label="Три имена" value={profile.fullName} />
-        <ReviewRow label="Телефон" value={profile.phone} />
-        <ReviewRow label="Имейл" value={profile.email} />
+        <ReviewRow styles={styles} label="Три имена" value={profile.fullName} />
+        <ReviewRow styles={styles} label="Телефон" value={profile.phone} />
+        <ReviewRow styles={styles} label="Имейл" value={profile.email} />
       </View>
 
       <View style={styles.card}>
@@ -38,12 +49,13 @@ export default function ApplicationReview({
         </View>
 
         <ReviewRow
+          styles={styles}
           label="Месечен доход"
           value={monthlyIncome ? `${monthlyIncome} €` : ""}
         />
-        <ReviewRow label="Месторабота" value={workplace} />
-        <ReviewRow label="Вид заетост" value={employmentType} />
-        <ReviewRow label="Цел на кредита" value={loanPurpose} />
+        <ReviewRow styles={styles} label="Месторабота" value={workplace} />
+        <ReviewRow styles={styles} label="Вид заетост" value={employmentType} />
+        <ReviewRow styles={styles} label="Цел на кредита" value={loanPurpose} />
       </View>
 
       <View style={styles.loanCard}>
@@ -60,11 +72,16 @@ export default function ApplicationReview({
 
         <View style={styles.divider} />
 
-        <LoanRow label="Желана сума" value={`${loan.amount.toFixed(2)} €`} />
+        <LoanRow
+          styles={styles}
+          label="Желана сума"
+          value={`${loan.amount.toFixed(2)} €`}
+        />
 
-        <LoanRow label="Срок" value={`${loan.months} месеца`} />
+        <LoanRow styles={styles} label="Срок" value={`${loan.months} месеца`} />
 
         <LoanRow
+          styles={styles}
           label="Годишна лихва"
           value={`${loan.annualRate.toFixed(2)} %`}
         />
@@ -91,7 +108,7 @@ export default function ApplicationReview({
   );
 }
 
-function ReviewRow({ label, value }) {
+function ReviewRow({ styles, label, value }) {
   return (
     <View style={styles.reviewRow}>
       <Text style={styles.reviewLabel}>{label}</Text>
@@ -100,7 +117,7 @@ function ReviewRow({ label, value }) {
   );
 }
 
-function LoanRow({ label, value }) {
+function LoanRow({ styles, label, value }) {
   return (
     <View style={styles.loanRow}>
       <Text style={styles.loanText}>{label}</Text>
@@ -109,126 +126,136 @@ function LoanRow({ label, value }) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    gap: 14,
-    paddingBottom: 20,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "800",
-    color: "#233D8B",
-  },
-  subtitle: {
-    fontSize: 13,
-    color: "#64748B",
-    marginTop: -8,
-    marginBottom: 4,
-  },
-  card: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 18,
-    padding: 16,
-    gap: 12,
-  },
-  cardHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 9,
-    marginBottom: 4,
-  },
-  sectionTitle: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: "#233D8B",
-  },
-  reviewRow: {
-    gap: 4,
-    paddingBottom: 9,
-    borderBottomWidth: 1,
-    borderBottomColor: "#EEF1F6",
-  },
-  reviewLabel: {
-    fontSize: 13,
-    color: "#64748B",
-  },
-  reviewValue: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#334155",
-  },
-  loanCard: {
-    backgroundColor: "#233D8B",
-    borderRadius: 18,
-    padding: 18,
-    gap: 10,
-  },
-  loanTitle: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: "#FFFFFF",
-  },
-  loanLabel: {
-    fontSize: 13,
-    color: "#DCE5F5",
-  },
-  loanPayment: {
-    fontSize: 30,
-    fontWeight: "800",
-    color: "#FFFFFF",
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#6478AD",
-    marginVertical: 6,
-  },
-  loanRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 8,
-  },
-  loanText: {
-    fontSize: 13,
-    color: "#DCE5F5",
-  },
-  loanValue: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#FFFFFF",
-  },
-  actions: {
-    gap: 12,
-    marginTop: 20,
-  },
-  submitButton: {
-    backgroundColor: "#233D8B",
-    paddingVertical: 16,
-    borderRadius: 14,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
-  },
-  submitButtonText: {
-    color: "#FFFFFF",
-    fontSize: 15,
-    fontWeight: "700",
-  },
-  backButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    paddingVertical: 14,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: "#233D8B",
-    backgroundColor: "transparent",
-  },
-  backButtonText: {
-    color: "#233D8B",
-    fontSize: 14,
-    fontWeight: "600",
-  },
-});
+const createStyles = ({
+  isSmallPhone,
+  cardPadding,
+  moderateScale,
+  sectionGap,
+}) =>
+  StyleSheet.create({
+    container: {
+      gap: sectionGap - 6,
+      paddingBottom: 20,
+    },
+    title: {
+      fontSize: moderateScale(isSmallPhone ? 20 : 22),
+      fontWeight: "800",
+      color: "#233D8B",
+    },
+    subtitle: {
+      fontSize: moderateScale(13),
+      color: "#64748B",
+      marginTop: -8,
+      marginBottom: 4,
+    },
+    card: {
+      backgroundColor: "#FFFFFF",
+      borderRadius: 18,
+      padding: cardPadding,
+      gap: 12,
+    },
+    cardHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 9,
+      marginBottom: 4,
+    },
+    sectionTitle: {
+      fontSize: moderateScale(17),
+      fontWeight: "700",
+      color: "#233D8B",
+    },
+    reviewRow: {
+      gap: 4,
+      paddingBottom: 9,
+      borderBottomWidth: 1,
+      borderBottomColor: "#EEF1F6",
+    },
+    reviewLabel: {
+      fontSize: moderateScale(13),
+      color: "#64748B",
+    },
+    reviewValue: {
+      fontSize: moderateScale(15),
+      fontWeight: "600",
+      color: "#334155",
+      flexShrink: 1,
+    },
+    loanCard: {
+      backgroundColor: "#233D8B",
+      borderRadius: 18,
+      padding: cardPadding,
+      gap: 10,
+    },
+    loanTitle: {
+      fontSize: moderateScale(17),
+      fontWeight: "700",
+      color: "#FFFFFF",
+    },
+    loanLabel: {
+      fontSize: moderateScale(13),
+      color: "#DCE5F5",
+    },
+    loanPayment: {
+      fontSize: moderateScale(isSmallPhone ? 26 : 30),
+      fontWeight: "800",
+      color: "#FFFFFF",
+    },
+    divider: {
+      height: 1,
+      backgroundColor: "#6478AD",
+      marginVertical: 6,
+    },
+    loanRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      gap: 8,
+      flexWrap: "wrap",
+    },
+    loanText: {
+      fontSize: moderateScale(13),
+      color: "#DCE5F5",
+      flexShrink: 1,
+    },
+    loanValue: {
+      fontSize: moderateScale(14),
+      fontWeight: "700",
+      color: "#FFFFFF",
+      flexShrink: 1,
+    },
+    actions: {
+      gap: 12,
+      marginTop: 20,
+    },
+    submitButton: {
+      backgroundColor: "#233D8B",
+      paddingVertical: moderateScale(16),
+      borderRadius: 14,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 10,
+    },
+    submitButtonText: {
+      color: "#FFFFFF",
+      fontSize: moderateScale(15),
+      fontWeight: "700",
+    },
+    backButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+      paddingVertical: moderateScale(14),
+      borderRadius: 12,
+      borderWidth: 1.5,
+      borderColor: "#233D8B",
+      backgroundColor: "transparent",
+    },
+    backButtonText: {
+      color: "#233D8B",
+      fontSize: moderateScale(14),
+      fontWeight: "600",
+    },
+  });

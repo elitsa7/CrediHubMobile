@@ -4,7 +4,6 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
-  useWindowDimensions,
   Pressable,
   Alert,
   Image,
@@ -13,10 +12,20 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "../../auth/context/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
 import { supabase } from "../../../lib/supabase";
+import { useResponsive } from "../../../utils/responsive";
 import { useCallback, useState } from "react";
 import { useRouter, useFocusEffect } from "expo-router";
 
 export default function ProfileScreen() {
+  const { isSmallPhone, horizontalPadding, moderateScale, cardPadding } =
+    useResponsive();
+
+  const styles = createStyles({
+    isSmallPhone,
+    horizontalPadding,
+    moderateScale,
+    cardPadding,
+  });
   const { user, logout } = useAuth();
   const [profile, setProfile] = useState(null);
   const displayName = profile?.full_name || "Потребител";
@@ -30,10 +39,7 @@ export default function ProfileScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [reload, setReload] = useState(0);
-  const { width } = useWindowDimensions();
-  const styles = createStyles(width);
   const router = useRouter();
-
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
@@ -214,33 +220,38 @@ export default function ProfileScreen() {
   );
 }
 
-const createStyles = (width) =>
+const createStyles = ({
+  isSmallPhone,
+  horizontalPadding,
+  moderateScale,
+  cardPadding,
+}) =>
   StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: "#bac8e0",
-      paddingHorizontal: width < 380 ? 16 : width < 600 ? 24 : 32,
-      paddingTop: width < 380 ? 16 : 20,
+      paddingHorizontal: horizontalPadding,
+      paddingTop: moderateScale(isSmallPhone ? 16 : 20),
     },
     header: {
       flexDirection: "row",
       alignItems: "center",
       gap: 12,
-      marginBottom: width < 380 ? 18 : 24,
+      marginBottom: moderateScale(isSmallPhone ? 18 : 24),
     },
     backButton: {
       padding: 4,
     },
     title: {
-      fontSize: width < 380 ? 23 : 26,
+      fontSize: moderateScale(isSmallPhone ? 23 : 26),
       fontWeight: "800",
       color: "#233D8B",
     },
     profileCard: {
       backgroundColor: "#FFFFFF",
-      padding: width < 380 ? 16 : 20,
-      borderRadius: width < 380 ? 16 : 20,
-      marginBottom: width < 380 ? 20 : 24,
+      padding: cardPadding,
+      borderRadius: isSmallPhone ? 16 : 20,
+      marginBottom: moderateScale(isSmallPhone ? 20 : 24),
       width: "100%",
       maxWidth: 600,
       alignSelf: "center",
@@ -248,19 +259,19 @@ const createStyles = (width) =>
     profileHeader: {
       flexDirection: "row",
       alignItems: "center",
-      gap: width < 380 ? 10 : 14,
+      gap: moderateScale(isSmallPhone ? 10 : 14),
     },
     avatar: {
-      width: width < 380 ? 54 : 64,
-      height: width < 380 ? 54 : 64,
-      borderRadius: width < 380 ? 27 : 32,
+      width: moderateScale(isSmallPhone ? 54 : 64),
+      height: moderateScale(isSmallPhone ? 54 : 64),
+      borderRadius: moderateScale(isSmallPhone ? 27 : 32),
       backgroundColor: "#E8EEFF",
       justifyContent: "center",
       alignItems: "center",
       overflow: "hidden",
     },
     initials: {
-      fontSize: width < 380 ? 17 : 20,
+      fontSize: moderateScale(isSmallPhone ? 17 : 20),
       fontWeight: "800",
       color: "#233D8B",
     },
@@ -279,52 +290,55 @@ const createStyles = (width) =>
       borderTopColor: "#E8EEFF",
     },
     name: {
-      fontSize: width < 380 ? 15 : 17,
+      fontSize: moderateScale(isSmallPhone ? 15 : 17),
       fontWeight: "800",
       color: "#233D8B",
       letterSpacing: 0.2,
+      flexShrink: 1,
     },
     email: {
-      fontSize: width < 380 ? 12 : 13,
+      fontSize: moderateScale(isSmallPhone ? 12 : 13),
       fontWeight: "500",
       color: "#71809B",
+      flexShrink: 1,
     },
     phone: {
-      fontSize: width < 380 ? 14 : 15,
+      fontSize: moderateScale(isSmallPhone ? 14 : 15),
       fontWeight: "600",
       color: "#52658A",
       letterSpacing: 0.3,
     },
     section: {
-      marginTop: width < 380 ? 8 : 12,
+      marginTop: moderateScale(isSmallPhone ? 8 : 12),
       width: "100%",
       maxWidth: 600,
       alignSelf: "center",
     },
     sectionTitle: {
-      fontSize: width < 380 ? 16 : 18,
+      fontSize: moderateScale(isSmallPhone ? 16 : 18),
       fontWeight: "700",
       color: "#233D8B",
-      marginBottom: width < 380 ? 10 : 12,
+      marginBottom: moderateScale(isSmallPhone ? 10 : 12),
     },
     menuItem: {
       backgroundColor: "#FFFFFF",
-      padding: width < 380 ? 14 : 18,
-      borderRadius: width < 380 ? 12 : 14,
+      padding: moderateScale(isSmallPhone ? 14 : 18),
+      borderRadius: isSmallPhone ? 12 : 14,
       flexDirection: "row",
       alignItems: "center",
     },
     menuText: {
       flex: 1,
-      marginLeft: width < 380 ? 10 : 14,
+      marginLeft: moderateScale(isSmallPhone ? 10 : 14),
+      minWidth: 0,
     },
     menuTitle: {
-      fontSize: width < 380 ? 14 : 15,
+      fontSize: moderateScale(isSmallPhone ? 14 : 15),
       fontWeight: "600",
       color: "#233D8B",
     },
     menuDescription: {
-      fontSize: width < 380 ? 11 : 12,
+      fontSize: moderateScale(isSmallPhone ? 11 : 12),
       color: "#64748B",
       marginTop: 4,
     },
@@ -335,25 +349,25 @@ const createStyles = (width) =>
     },
     loadingText: {
       marginTop: 12,
-      fontSize: width < 380 ? 13 : 14,
+      fontSize: moderateScale(isSmallPhone ? 13 : 14),
       color: "#233D8B",
     },
     retryButton: {
       marginTop: 18,
-      fontSize: 15,
+      fontSize: moderateScale(15),
       fontWeight: "700",
       color: "#233D8B",
       padding: 10,
     },
     menuGroup: {
       backgroundColor: "#FFFFFF",
-      borderRadius: width < 380 ? 12 : 14,
+      borderRadius: isSmallPhone ? 12 : 14,
       overflow: "hidden",
     },
     menuDivider: {
       height: 1,
       backgroundColor: "#E8EEFF",
-      marginHorizontal: width < 380 ? 14 : 18,
+      marginHorizontal: moderateScale(isSmallPhone ? 14 : 18),
     },
     logoutSection: {
       marginTop: "auto",
@@ -362,8 +376,8 @@ const createStyles = (width) =>
     },
     logoutButton: {
       backgroundColor: "#FFFFFF",
-      padding: width < 380 ? 14 : 18,
-      borderRadius: width < 380 ? 12 : 14,
+      padding: moderateScale(isSmallPhone ? 14 : 18),
+      borderRadius: isSmallPhone ? 12 : 14,
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
@@ -373,7 +387,7 @@ const createStyles = (width) =>
     },
     logoutText: {
       color: "#DC2626",
-      fontSize: width < 380 ? 14 : 15,
+      fontSize: moderateScale(isSmallPhone ? 14 : 15),
       fontWeight: "700",
     },
   });

@@ -1,17 +1,17 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  useWindowDimensions,
-  Pressable,
-} from "react-native";
+import { View, Text, StyleSheet, Image, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useResponsive } from "../../../utils/responsive";
 
 export default function WelcomeCard() {
-  const { width } = useWindowDimensions();
-  const styles = createStyles(width);
+  const { width, isSmallPhone, cardPadding, moderateScale } = useResponsive();
+
+  const styles = createStyles({
+    width,
+    isSmallPhone,
+    cardPadding,
+    moderateScale,
+  });
   const router = useRouter();
 
   return (
@@ -49,7 +49,7 @@ export default function WelcomeCard() {
         <View style={styles.arrowButton}>
           <Ionicons
             name="arrow-forward-outline"
-            size={width < 380 ? 25 : 30}
+            size={moderateScale(isSmallPhone ? 25 : 30)}
             color="#BBD2FF"
           />
         </View>
@@ -57,14 +57,14 @@ export default function WelcomeCard() {
     </View>
   );
 }
-const createStyles = (width) =>
+const createStyles = ({ width, isSmallPhone, cardPadding, moderateScale }) =>
   StyleSheet.create({
     container: {
       backgroundColor: "#10285C",
       borderRadius: 26,
-      padding: width < 380 ? 18 : 24,
+      padding: cardPadding,
       marginTop: 20,
-      minHeight: width < 380 ? 310 : 330,
+      minHeight: isSmallPhone ? 310 : 330,
       justifyContent: "space-between",
       overflow: "hidden",
     },
@@ -83,17 +83,17 @@ const createStyles = (width) =>
       letterSpacing: 2,
     },
     title: {
-      fontSize: width < 380 ? 21 : 24,
+      fontSize: moderateScale(isSmallPhone ? 21 : 24),
       fontWeight: "800",
       color: "#FFFFFF",
-      lineHeight: width < 380 ? 28 : 32,
+      lineHeight: moderateScale(isSmallPhone ? 28 : 32),
       marginTop: 15,
       maxWidth: "85%",
     },
     description: {
-      fontSize: width < 380 ? 13 : 15,
+      fontSize: moderateScale(isSmallPhone ? 13 : 15),
       color: "#C6D7F5",
-      lineHeight: width < 380 ? 18 : 20,
+      lineHeight: moderateScale(isSmallPhone ? 18 : 20),
       marginTop: 15,
       maxWidth: "72%",
     },
@@ -106,9 +106,9 @@ const createStyles = (width) =>
       marginTop: 20,
     },
     calculatorIcon: {
-      width: width < 380 ? 44 : 50,
-      height: width < 380 ? 44 : 50,
-      borderRadius: width < 380 ? 15 : 20,
+      width: isSmallPhone ? 44 : 50,
+      height: isSmallPhone ? 44 : 50,
+      borderRadius: isSmallPhone ? 15 : 20,
       backgroundColor: "#FFFFFF",
       justifyContent: "center",
       alignItems: "center",
@@ -131,18 +131,18 @@ const createStyles = (width) =>
       textAlign: "center",
     },
     arrowButton: {
-      width: 46,
-      height: 46,
-      borderRadius: 23,
+      width: moderateScale(46),
+      height: moderateScale(46),
+      borderRadius: moderateScale(23),
       backgroundColor: "#17366F",
       justifyContent: "center",
       alignItems: "center",
     },
     illustration: {
       position: "absolute",
-      width: width < 380 ? 180 : 220,
-      height: width < 380 ? 155 : 190,
-      right: width < 380 ? -10 : -15,
+      width: isSmallPhone ? 180 : 220,
+      height: isSmallPhone ? 155 : 190,
+      right: isSmallPhone ? -10 : -15,
       bottom: 75,
       opacity: 0.95,
     },

@@ -1,22 +1,19 @@
-import {
-  StyleSheet,
-  useWindowDimensions,
-  ScrollView,
-  Pressable,
-  Text,
-} from "react-native";
+import { StyleSheet, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
-import { supabase } from "../../../lib/supabase";
+import { useResponsive } from "../../../utils/responsive";
 import AppHeader from "../../../components/common/AppHeader";
 import WelcomeCard from "../../../features/home/components/WelcomeCard";
 import FinancialCard from "../../../features/home/components/FinanceSummary";
 import NextPaymentCard from "../../../features/home/components/NextPaymentCard";
 
 export default function HomeScreen() {
-  const { width } = useWindowDimensions();
-  const styles = createStyles(width);
-  const router = useRouter();
+  const { horizontalPadding, contentMaxWidth, moderateScale } = useResponsive();
+
+  const styles = createStyles({
+    horizontalPadding,
+    contentMaxWidth,
+    moderateScale,
+  });
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -29,12 +26,15 @@ export default function HomeScreen() {
   );
 }
 
-const createStyles = (width) =>
+const createStyles = ({ horizontalPadding, contentMaxWidth, moderateScale }) =>
   StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: "#bac8e0",
-      paddingHorizontal: width < 380 ? 16 : 24,
-      paddingTop: 20,
+      paddingHorizontal: horizontalPadding,
+      paddingTop: moderateScale(20),
+      width: "100%",
+      maxWidth: contentMaxWidth,
+      alignSelf: "center",
     },
   });

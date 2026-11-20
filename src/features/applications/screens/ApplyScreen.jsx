@@ -1,16 +1,10 @@
-import {
-  View,
-  Text,
-  Pressable,
-  useWindowDimensions,
-  ScrollView,
-  StyleSheet,
-} from "react-native";
+import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { supabase } from "../../../lib/supabase";
+import { useResponsive } from "../../../utils/responsive";
 
 import { useAuth } from "../../auth/context/AuthContext";
 import ApplicationReview from "../components/ApplicationReview";
@@ -20,9 +14,15 @@ import { checkLoan } from "../utils/automaticCheckLoan";
 import { generateInstallments } from "../utils/generateInstallments";
 
 export default function ApplyScreen() {
-  const { width } = useWindowDimensions();
-  const styles = createStyles(width);
+  const { width, isSmallPhone, horizontalPadding, moderateScale } =
+    useResponsive();
 
+  const styles = createStyles({
+    width,
+    isSmallPhone,
+    horizontalPadding,
+    moderateScale,
+  });
   const router = useRouter();
   const params = useLocalSearchParams();
   const { user } = useAuth();
@@ -332,22 +332,28 @@ export default function ApplyScreen() {
   );
 }
 
-const createStyles = (width) =>
+const createStyles = ({
+  isSmallPhone,
+  width,
+  horizontalPadding,
+  moderateScale,
+}) =>
   StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: "#BAC8E0",
     },
     scrollContent: {
-      paddingHorizontal: 18,
+      paddingHorizontal: horizontalPadding,
       paddingTop: 4,
       paddingBottom: 30,
+      width: "100%",
     },
     header: {
       flexDirection: "row",
       alignItems: "center",
       width: "100%",
-      gap: width < 360 ? 8 : 12,
+      gap: moderateScale(width < 360 ? 8 : 12),
       marginBottom: 15,
     },
     loadingContainer: {
@@ -358,7 +364,7 @@ const createStyles = (width) =>
     },
     loadingText: {
       color: "#233D8B",
-      fontSize: 15,
+      fontSize: moderateScale(15),
       fontWeight: "600",
     },
     stepperContainer: {
@@ -383,9 +389,9 @@ const createStyles = (width) =>
       gap: 4,
     },
     stepCircle: {
-      width: width < 350 ? 26 : 30,
-      height: width < 350 ? 26 : 30,
-      borderRadius: width < 350 ? 13 : 15,
+      width: moderateScale(isSmallPhone ? 26 : 30),
+      height: moderateScale(isSmallPhone ? 26 : 30),
+      borderRadius: moderateScale(isSmallPhone ? 13 : 15),
       backgroundColor: "#E8EDF5",
       justifyContent: "center",
       alignItems: "center",
@@ -396,14 +402,14 @@ const createStyles = (width) =>
     stepNumber: {
       color: "#64748B",
       fontWeight: "700",
-      fontSize: 13,
+      fontSize: moderateScale(13),
     },
     stepNumberActive: {
       color: "#FFFFFF",
     },
     stepLabel: {
       color: "#94A3B8",
-      fontSize: width < 350 ? 10 : width > 430 ? 13 : 12,
+      fontSize: moderateScale(isSmallPhone ? 10 : width > 430 ? 13 : 12),
       fontWeight: "500",
       textAlign: "center",
     },

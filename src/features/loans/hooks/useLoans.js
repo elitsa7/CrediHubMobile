@@ -67,6 +67,7 @@ export function useLoans() {
 
     return () => clearTimeout(timeoutId);
   }, [fetchLoans]);
+
   const refreshLoans = useCallback(() => {
     fetchLoans(true);
   }, [fetchLoans]);

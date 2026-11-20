@@ -1,23 +1,24 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  useWindowDimensions,
-  ScrollView,
-} from "react-native";
+import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Slider from "@react-native-community/slider";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useResponsive } from "../../../utils/responsive";
 import { calculateLoan } from "../utils/calculateLoan";
 import { LOAN_CONFIG } from "../../../config/loanConfig";
 
 export default function CalculatorScreen() {
+  const { isSmallPhone, horizontalPadding, cardPadding, moderateScale } =
+    useResponsive();
+
+  const styles = createStyles({
+    isSmallPhone,
+    horizontalPadding,
+    cardPadding,
+    moderateScale,
+  });
   const router = useRouter();
-  const { width } = useWindowDimensions();
-  const styles = createStyles(width);
   const [amount, setAmount] = useState(300);
   const [months, setMonths] = useState(3);
   const result = calculateLoan(amount, LOAN_CONFIG.annualInterestRate, months);
@@ -150,7 +151,12 @@ export default function CalculatorScreen() {
   );
 }
 
-const createStyles = (width) =>
+const createStyles = ({
+  isSmallPhone,
+  horizontalPadding,
+  cardPadding,
+  moderateScale,
+}) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -161,14 +167,14 @@ const createStyles = (width) =>
     },
     content: {
       flexGrow: 1,
-      paddingHorizontal: width < 380 ? 16 : 22,
-      paddingTop: 16,
+      paddingHorizontal: horizontalPadding,
+      paddingTop: moderateScale(16),
       paddingBottom: 12,
     },
     mainContent: {
       flexGrow: 1,
       justifyContent: "space-between",
-      gap: 14,
+      gap: moderateScale(14),
     },
     header: {
       flexDirection: "row",
@@ -177,14 +183,14 @@ const createStyles = (width) =>
       marginBottom: 16,
     },
     backButton: {
-      width: 40,
-      height: 40,
+      width: moderateScale(40),
+      height: moderateScale(40),
       borderRadius: 12,
       justifyContent: "center",
       alignItems: "center",
     },
     title: {
-      fontSize: width < 380 ? 19 : 22,
+      fontSize: moderateScale(isSmallPhone ? 19 : 22),
       fontWeight: "700",
       color: "#233D8B",
       flex: 1,
@@ -192,20 +198,20 @@ const createStyles = (width) =>
     },
     summaryCard: {
       backgroundColor: "#233D8B",
-      paddingHorizontal: width < 380 ? 17 : 21,
-      paddingVertical: width < 380 ? 16 : 19,
+      paddingHorizontal: cardPadding,
+      paddingVertical: moderateScale(isSmallPhone ? 16 : 19),
       borderRadius: 20,
       marginBottom: 14,
     },
     summaryLabel: {
       color: "#DCE5F5",
-      fontSize: 11,
+      fontSize: moderateScale(11),
       fontWeight: "700",
       letterSpacing: 0.5,
     },
     monthlyPayment: {
       color: "#FFFFFF",
-      fontSize: width < 380 ? 31 : 36,
+      fontSize: moderateScale(isSmallPhone ? 31 : 36),
       fontWeight: "800",
       marginTop: 6,
       marginBottom: 11,
@@ -222,21 +228,23 @@ const createStyles = (width) =>
     summaryStat: {
       flex: 1,
       gap: 4,
+      minWidth: 0,
     },
     summaryStatLabel: {
       color: "#DCE5F5",
-      fontSize: 12,
+      fontSize: moderateScale(12),
     },
     summaryStatValue: {
       color: "#FFFFFF",
-      fontSize: width < 380 ? 14 : 16,
+      fontSize: moderateScale(isSmallPhone ? 14 : 16),
       fontWeight: "700",
+      flexShrink: 1,
     },
     controlsCard: {
       backgroundColor: "#FFFFFF",
       borderRadius: 20,
-      padding: width < 380 ? 16 : 20,
-      gap: 16,
+      padding: cardPadding,
+      gap: moderateScale(16),
       marginBottom: 8,
     },
     sliderSection: {
@@ -251,12 +259,12 @@ const createStyles = (width) =>
     },
     label: {
       color: "#233D8B",
-      fontSize: 14,
+      fontSize: moderateScale(14),
       fontWeight: "700",
     },
     value: {
       color: "#233D8B",
-      fontSize: 17,
+      fontSize: moderateScale(17),
       fontWeight: "800",
     },
     slider: {
@@ -269,7 +277,7 @@ const createStyles = (width) =>
     },
     rangeText: {
       color: "#718096",
-      fontSize: 11,
+      fontSize: moderateScale(11),
     },
     controlDivider: {
       height: 1,
@@ -280,20 +288,22 @@ const createStyles = (width) =>
       justifyContent: "space-between",
       alignItems: "center",
       paddingTop: 4,
+      gap: 8,
     },
     interestLabel: {
       color: "#64748B",
-      fontSize: 13,
+      fontSize: moderateScale(13),
+      flexShrink: 1,
     },
     interestValue: {
       color: "#233D8B",
-      fontSize: 15,
+      fontSize: moderateScale(15),
       fontWeight: "800",
     },
     applyButton: {
       backgroundColor: "#233D8B",
       borderRadius: 14,
-      padding: 17,
+      padding: moderateScale(17),
       flexDirection: "row",
       justifyContent: "center",
       alignItems: "center",
@@ -303,7 +313,7 @@ const createStyles = (width) =>
     },
     applyButtonText: {
       color: "#FFFFFF",
-      fontSize: 15,
+      fontSize: moderateScale(15),
       fontWeight: "700",
     },
     footer: {
@@ -317,7 +327,7 @@ const createStyles = (width) =>
     },
     footerText: {
       color: "#536887",
-      fontSize: 12,
+      fontSize: moderateScale(12),
       fontWeight: "600",
     },
   });

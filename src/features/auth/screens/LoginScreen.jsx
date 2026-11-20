@@ -1,7 +1,3 @@
-import { useState } from "react";
-import { useRouter } from "expo-router";
-import { supabase } from "../../../lib/supabase";
-
 import {
   View,
   Text,
@@ -11,17 +7,27 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   Platform,
-  useWindowDimensions,
 } from "react-native";
+import { useState } from "react";
+import { useRouter } from "expo-router";
+import { supabase } from "../../../lib/supabase";
+import { useResponsive } from "../../../utils/responsive";
 
 export default function LoginScreen() {
+  const { isSmallPhone, isCompactHeight, horizontalPadding, moderateScale } =
+    useResponsive();
+
+  const styles = createStyles({
+    isSmallPhone,
+    isCompactHeight,
+    horizontalPadding,
+    moderateScale,
+  });
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
-  const { width, height } = useWindowDimensions();
-  const styles = createStyles(width, height);
   const router = useRouter();
 
   const handleLogin = async () => {
@@ -125,10 +131,13 @@ export default function LoginScreen() {
   );
 }
 
-const createStyles = (width, height) => {
-  const horizontalPadding = width < 380 ? 16 : width < 600 ? 24 : 40;
-
-  return StyleSheet.create({
+const createStyles = ({
+  isSmallPhone,
+  isCompactHeight,
+  horizontalPadding,
+  moderateScale,
+}) =>
+  StyleSheet.create({
     keyboardContainer: {
       flex: 1,
       backgroundColor: "#BAC8E0",
@@ -141,19 +150,19 @@ const createStyles = (width, height) => {
       flex: 1,
       justifyContent: "center",
       paddingHorizontal: horizontalPadding,
-      paddingVertical: height < 700 ? 24 : 40,
+      paddingVertical: isCompactHeight ? 24 : 40,
     },
     title: {
-      fontSize: width < 380 ? 30 : 34,
+      fontSize: moderateScale(isSmallPhone ? 30 : 34),
       fontWeight: "bold",
       color: "#10285C",
       textAlign: "center",
       marginBottom: 10,
     },
     subtitle: {
-      fontSize: width < 380 ? 16 : 18,
+      fontSize: moderateScale(isSmallPhone ? 16 : 18),
       textAlign: "center",
-      marginBottom: 35,
+      marginBottom: isCompactHeight ? 24 : 35,
       color: "#10285C",
     },
     input: {
@@ -161,7 +170,7 @@ const createStyles = (width, height) => {
       borderRadius: 12,
       padding: 16,
       marginBottom: 16,
-      fontSize: 16,
+      fontSize: moderateScale(16),
     },
     button: {
       backgroundColor: "#10285C",
@@ -175,31 +184,31 @@ const createStyles = (width, height) => {
     },
     buttonText: {
       color: "#FFFFFF",
-      fontSize: 17,
+      fontSize: moderateScale(17),
       fontWeight: "bold",
     },
     registerContainer: {
       flexDirection: "row",
       justifyContent: "center",
       alignItems: "center",
-      marginTop: 25,
+      marginTop: isCompactHeight ? 18 : 25,
       gap: 5,
+      flexWrap: "wrap",
     },
     registerText: {
       color: "#10285C",
-      fontSize: 14,
+      fontSize: moderateScale(14),
     },
     registerLink: {
       color: "#2457B5",
-      fontSize: 14,
+      fontSize: moderateScale(14),
       fontWeight: "bold",
       textDecorationLine: "underline",
     },
     errorText: {
       color: "#D32F2F",
-      fontSize: 14,
+      fontSize: moderateScale(14),
       marginBottom: 12,
       marginLeft: 4,
     },
   });
-};
