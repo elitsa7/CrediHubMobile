@@ -12,6 +12,7 @@ export default function AppLayout() {
           flex: 1,
           justifyContent: "center",
           alignItems: "center",
+          paddingBottom: 20,
         }}
       >
         <ActivityIndicator size="large" color="#10285C" />

@@ -185,6 +185,7 @@ export default function ApplyScreen() {
             annual_interest_rate: loan.annualRate,
             term_months: loan.months,
             start_date: new Date().toISOString().split("T")[0],
+            status: "active",
           })
           .select("id")
           .single();

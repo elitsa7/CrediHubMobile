@@ -72,6 +72,7 @@ export function generateInstallments(principal, annualRate, months) {
       due_date: formattedDate,
       principal_amount: principalPayment,
       interest_amount: interest,
+      total_amount: totalAmount,
       paid_amount: 0,
       status: "pending",
     });
