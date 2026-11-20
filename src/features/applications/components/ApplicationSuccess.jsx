@@ -1,19 +1,44 @@
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-export default function ApplicationSuccess({ applicationId, onHome }) {
+export default function ApplicationSuccess({ applicationId, result, onHome }) {
+  const isApproved = result?.status === "approved";
+  const isRejected = result?.status === "rejected";
+  const statusConfig = isApproved
+    ? {
+        title: "Кредитът е одобрен!",
+        subtitle: "Поздравления! Заявката ти отговаря на условията.",
+        status: "Одобрена заявка",
+        icon: "checkmark-circle",
+        color: "#16A36A",
+      }
+    : isRejected
+      ? {
+          title: "Заявката е отхвърлена",
+          subtitle: "За съжаление заявката не отговаря на условията.",
+          status: "Отхвърлена заявка",
+          icon: "close-circle",
+          color: "#DC2626",
+        }
+      : {
+          title: "Заявката е изпратена!",
+          subtitle: "Получихме успешно твоята заявка.",
+          status: "В очакване на разглеждане",
+          icon: "time",
+          color: "#E5A000",
+        };
+
   return (
     <View style={styles.container}>
-      <View style={styles.iconContainer}>
-        <Ionicons name="checkmark" size={48} color="#FFFFFF" />
+      <View
+        style={[styles.iconContainer, { backgroundColor: statusConfig.color }]}
+      >
+        <Ionicons name={statusConfig.icon} size={48} color="#FFFFFF" />
       </View>
 
-      <Text style={styles.title}>Заявката е изпратена!</Text>
+      <Text style={styles.title}>{statusConfig.title}</Text>
 
-      <Text style={styles.subtitle}>
-        Благодарим ти! Получихме успешно твоята заявка за кредит. Тя ще бъде
-        разгледана и ще можеш да следиш нейния статус.
-      </Text>
+      <Text style={styles.subtitle}>{statusConfig.subtitle}</Text>
 
       <View style={styles.card}>
         <Text style={styles.label}>Номер на заявката</Text>
@@ -23,9 +48,25 @@ export default function ApplicationSuccess({ applicationId, onHome }) {
         </Text>
 
         <View style={styles.statusRow}>
-          <View style={styles.statusDot} />
-          <Text style={styles.statusText}>В очакване на разглеждане</Text>
+          <View
+            style={[styles.statusDot, { backgroundColor: statusConfig.color }]}
+          />
+          <Text style={styles.statusText}>{statusConfig.status}</Text>
         </View>
+
+        {isRejected && result?.reason && (
+          <View style={styles.reasonContainer}>
+            <Text style={styles.reasonTitle}>Причина за отказа</Text>
+            <Text style={styles.reasonText}>{result.reason}</Text>
+          </View>
+        )}
+
+        {isApproved && (
+          <View style={styles.reasonContainer}>
+            <Text style={styles.reasonTitle}>Оценка на заявката</Text>
+            <Text style={styles.reasonText}>{result.score}/100 точки</Text>
+          </View>
+        )}
       </View>
 
       <Pressable style={styles.button} onPress={onHome}>
@@ -48,7 +89,6 @@ const styles = StyleSheet.create({
     width: 90,
     height: 90,
     borderRadius: 45,
-    backgroundColor: "#16A36A",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -92,12 +132,27 @@ const styles = StyleSheet.create({
     width: 9,
     height: 9,
     borderRadius: 5,
-    backgroundColor: "#E5A000",
   },
   statusText: {
     fontSize: 13,
     fontWeight: "600",
     color: "#64748B",
+  },
+  reasonContainer: {
+    borderTopWidth: 1,
+    borderTopColor: "#E2E8F0",
+    paddingTop: 12,
+    gap: 5,
+  },
+  reasonTitle: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#233D8B",
+  },
+  reasonText: {
+    fontSize: 13,
+    lineHeight: 20,
+    color: "#475569",
   },
   button: {
     width: "100%",

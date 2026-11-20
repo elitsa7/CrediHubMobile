@@ -16,6 +16,8 @@ import { useAuth } from "../../auth/context/AuthContext";
 import ApplicationReview from "../components/ApplicationReview";
 import ApplicationFormStep from "../components/ApplicationFormStep";
 import ApplicationSuccess from "../components/ApplicationSuccess";
+import { checkLoan } from "../utils/automaticCheckLoan";
+import { generateInstallments } from "../utils/generateInstallments";
 
 export default function ApplyScreen() {
   const { width } = useWindowDimensions();
@@ -37,6 +39,7 @@ export default function ApplyScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [applicationId, setApplicationId] = useState(null);
+  const [applicationResult, setApplicationResult] = useState(null);
 
   const [profile, setProfile] = useState({
     fullName: "",
@@ -101,13 +104,13 @@ export default function ApplyScreen() {
       return;
     }
 
-    if (!workplace.trim()) {
-      alert("Моля, въведи месторабота.");
+    if (!employmentType) {
+      alert("Моля, избери вид заетост.");
       return;
     }
 
-    if (!employmentType) {
-      alert("Моля, избери вид заетост.");
+    if (employmentType !== "Безработен" && !workplace.trim()) {
+      alert("Моля, въведи месторабота.");
       return;
     }
 
@@ -128,6 +131,8 @@ export default function ApplyScreen() {
     try {
       setIsSubmitting(true);
 
+      const income = Number(monthlyIncome.replace(",", "."));
+
       const { data, error } = await supabase
         .from("loan_applications")
         .insert({
@@ -140,13 +145,83 @@ export default function ApplyScreen() {
           loan_purpose: loanPurpose,
           workplace: workplace.trim(),
           employment_type: employmentType,
+          status: "pending",
         })
         .select("id")
         .single();
 
       if (error) throw error;
 
+      const result = checkLoan({
+        income,
+        payment: loan.monthlyPayment,
+        oldPayments: 0,
+        amount: loan.amount,
+        months: loan.months,
+        employmentType,
+      });
+
+      const { error: updateError } = await supabase
+        .from("loan_applications")
+        .update({
+          status: result.status,
+          assessment_score: result.score,
+          assessment_reason: result.reason,
+          rejection_reason: result.status === "rejected" ? result.reason : null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", data.id)
+        .eq("user_id", user.id);
+
+      if (updateError) throw updateError;
+
+      if (result.status === "approved") {
+        const { data: newLoan, error: loanError } = await supabase
+          .from("loans")
+          .insert({
+            user_id: user.id,
+            name: loanPurpose || "Потребителски кредит",
+            principal_amount: loan.amount,
+            annual_interest_rate: loan.annualRate,
+            term_months: loan.months,
+            start_date: new Date().toISOString().split("T")[0],
+          })
+          .select("id")
+          .single();
+
+        if (loanError) throw loanError;
+
+        const installments = generateInstallments(
+          loan.amount,
+          loan.annualRate,
+          loan.months,
+        );
+
+        const installmentsWithLoanId = installments.map((installment) => ({
+          ...installment,
+          loan_id: newLoan.id,
+        }));
+
+        const { error: installmentsError } = await supabase
+          .from("installments")
+          .insert(installmentsWithLoanId);
+
+        if (installmentsError) {
+          console.error(
+            "[INSTALLMENTS] Creation failed:",
+            installmentsError.message,
+          );
+
+          alert(
+            "Кредитът е създаден, но възникна грешка при генерирането на погасителния план.",
+          );
+
+          return;
+        }
+      }
+
       setApplicationId(data.id);
+      setApplicationResult(result);
       setStep(3);
     } catch (error) {
       console.error("[APPLICATION] Submission failed:", error.message);
@@ -184,8 +259,7 @@ export default function ApplyScreen() {
     if (user?.id) {
       loadProfile();
     }
-  }, [user?.id]);
-
+  }, [user?.id, user?.email]);
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -246,6 +320,7 @@ export default function ApplyScreen() {
             {step === 3 && (
               <ApplicationSuccess
                 applicationId={applicationId}
+                result={applicationResult}
                 onHome={() => router.replace("/home")}
               />
             )}

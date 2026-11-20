@@ -112,7 +112,7 @@ export default function CalculatorScreen() {
 
               <View style={styles.rangeLabels}>
                 <Text style={styles.rangeText}>3 месеца</Text>
-                <Text style={styles.rangeText}>120 месеца</Text>
+                <Text style={styles.rangeText}>60 месеца</Text>
               </View>
             </View>
 

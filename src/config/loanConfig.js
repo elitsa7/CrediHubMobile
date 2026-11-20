@@ -4,5 +4,5 @@ export const LOAN_CONFIG = {
   maxAmount: 30000,
   amountStep: 100,
   minMonths: 3,
-  maxMonths: 120,
+  maxMonths: 60,
 };

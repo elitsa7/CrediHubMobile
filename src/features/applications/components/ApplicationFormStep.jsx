@@ -56,6 +56,14 @@ export default function ApplicationFormStep({
     </Pressable>
   );
 
+  const handleEmploymentSelect = (option) => {
+    setEmploymentType(option);
+
+    if (option === "Безработен") {
+      setWorkplace("");
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.card}>
@@ -107,20 +115,28 @@ export default function ApplicationFormStep({
           onChangeText={setMonthlyIncome}
         />
 
-        <Text style={styles.label}>Месторабота</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Име на работодателя"
-          placeholderTextColor="#94A3B8"
-          value={workplace}
-          onChangeText={setWorkplace}
-        />
+        {employmentType !== "Безработен" && (
+          <>
+            <Text style={styles.label}>Месторабота</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Име на работодателя"
+              placeholderTextColor="#94A3B8"
+              value={workplace}
+              onChangeText={setWorkplace}
+            />
+          </>
+        )}
 
         <Text style={styles.label}>Вид заетост</Text>
 
         <View style={styles.optionsContainer}>
           {employmentOptions.map((option) =>
-            renderOption(option, employmentType === option, setEmploymentType),
+            renderOption(
+              option,
+              employmentType === option,
+              handleEmploymentSelect,
+            ),
           )}
         </View>
       </View>
